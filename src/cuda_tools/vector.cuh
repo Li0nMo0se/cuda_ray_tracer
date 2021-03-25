@@ -5,77 +5,29 @@
 
 namespace cuda_tools
 {
-namespace
-{
-template <typename T>
-__global__ void kernel_dealloc(T** const data, const int32_t size)
-{
-    for (int32_t i = 0; i < size; i++)
-        delete data[i];
-}
-
-template <typename T, typename... Ts>
-__global__ void kernel_add_object(T** const data, Ts... args)
-{
-    // Data is already at the location in which the new element is stored
-    *data = new T{args...};
-}
-
-// FIXME: kernel to print
-} // namespace
-
 template <typename T>
 class Vector
 {
   public:
-    Vector()
-        : Vector(begin_capacity)
-    {
-    }
+    // Default with constructor with a minimum capacity
+    Vector();
 
-    Vector(int32_t size)
-        : capacity_(size)
-    {
-        realloc(size);
-    }
+    // Constructor with a specified capacity
+    Vector(int32_t capacity);
 
-    ~Vector()
-    {
-        kernel_dealloc<<<1, 1>>>(data_, size_);
-        cuda_safe_call(cudaFree(data_));
-    }
+    // Deep destructor
+    ~Vector();
 
-    void realloc(const int32_t new_capacity)
-    {
-        if (!data_)
-            cuda_safe_call(
-                cudaMalloc((void**)&data_, sizeof(T*) * new_capacity));
-        else
-        {
-            T** tmp;
-            cuda_safe_call(cudaMalloc((void**)&tmp, sizeof(T*) * new_capacity));
-            cuda_safe_call(cudaMemcpy(tmp,
-                                      data_,
-                                      sizeof(T*) * size_,
-                                      cudaMemcpyDeviceToDevice));
-            cuda_safe_call(cudaFree(data_));
-            data_ = tmp;
-        }
-        capacity_ = new_capacity;
-    }
+    // Upgrade the capacity of the vector
+    void realloc(const int32_t new_capacity);
 
+    // Push back in the vector by constructing the object while pushing (no copy
+    // is performed)
     template <typename... Ts>
-    void emplace_back(Ts&&... args)
-    {
-        kernel_add_object<<<1, 1>>>(&(data_[size_]), std::forward<Ts>(args)...);
-        ++size_;
+    void emplace_back(Ts&&... args);
 
-        // Upgrade the capacity
-        if (size_ == capacity_)
-            realloc(capacity_ * 2);
-    }
-
-    int32_t size_get() const { return size_; }
+    // Get the current size of the vector
+    inline int32_t size_get() const;
 
   private:
     // Array
@@ -89,6 +41,10 @@ class Vector
     // Actual size of the vector
     int32_t size_ = 0;
 
+    // The default capacity of the vector
     static constexpr int32_t begin_capacity = 16;
 };
+
 } // namespace cuda_tools
+
+#include "vector.cuhxx"

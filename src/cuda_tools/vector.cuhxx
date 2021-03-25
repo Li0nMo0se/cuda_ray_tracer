@@ -1,0 +1,83 @@
+#include "vector.cuh"
+
+namespace cuda_tools
+{
+
+/* Kernels used internally by the vector to handle device memory */
+namespace
+{
+template <typename T>
+__global__ void kernel_dealloc(T** const data, const int32_t size)
+{
+    for (int32_t i = 0; i < size; i++)
+        delete data[i];
+}
+
+template <typename T, typename... Ts>
+__global__ void kernel_add_object(T** const data, Ts... args)
+{
+    // Data is already at the location in which the new element is stored
+    *data = new T{args...};
+}
+
+// FIXME: kernel to print
+} // namespace
+
+template <typename T>
+Vector<T>::Vector()
+    : Vector(begin_capacity)
+{
+}
+
+template <typename T>
+Vector<T>::Vector(int32_t capacity)
+    : capacity_(capacity)
+{
+    realloc(capacity);
+}
+
+template <typename T>
+Vector<T>::~Vector()
+{
+    kernel_dealloc<<<1, 1>>>(data_, size_);
+    cuda_safe_call(cudaFree(data_));
+}
+
+template <typename T>
+void Vector<T>::realloc(const int32_t new_capacity)
+{
+    if (!data_)
+        cuda_safe_call(cudaMalloc((void**)&data_, sizeof(T*) * new_capacity));
+    else
+    {
+        T** tmp;
+        cuda_safe_call(cudaMalloc((void**)&tmp, sizeof(T*) * new_capacity));
+        cuda_safe_call(cudaMemcpy(tmp,
+                                  data_,
+                                  sizeof(T*) * size_,
+                                  cudaMemcpyDeviceToDevice));
+        cuda_safe_call(cudaFree(data_));
+        data_ = tmp;
+    }
+    capacity_ = new_capacity;
+}
+
+template <typename T>
+template <typename... Ts>
+void Vector<T>::emplace_back(Ts&&... args)
+{
+    kernel_add_object<<<1, 1>>>(&(data_[size_]), std::forward<Ts>(args)...);
+    ++size_;
+
+    // Upgrade the capacity
+    if (size_ == capacity_)
+        realloc(capacity_ * 2);
+}
+
+template <typename T>
+inline int32_t Vector<T>::size_get() const
+{
+    return size_;
+}
+
+} // namespace cuda_tools
