@@ -12,9 +12,7 @@ message(STATUS "---")
 include_directories(src)
 
 set(SRC
-    src/main.cc
-
-    src/kernel.cu
+    src/main.cu
 )
 
 set(SRC_TESTS
