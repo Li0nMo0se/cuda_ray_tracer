@@ -1,6 +1,6 @@
-#include "cuda_tools/cuda_error.hh"
+#include "cuda_tools/cuda_error.cuh"
 #include "cuda_tools/optional.hh"
-#include "cuda_tools/vector.hh"
+#include "cuda_tools/vector.cuh"
 int main()
 {
     cuda_tools::Vector<int> vect;

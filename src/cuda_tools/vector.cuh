@@ -1,6 +1,7 @@
 #pragma once
 
-#include "cuda_error.hh"
+#include "cuda_error.cuh"
+#include <cuda_runtime.h>
 
 namespace cuda_tools
 {
@@ -19,6 +20,8 @@ __global__ void kernel_add_object(T** const data, Ts... args)
     // Data is already at the location in which the new element is stored
     *data = new T{args...};
 }
+
+// FIXME: kernel to print
 } // namespace
 
 template <typename T>
