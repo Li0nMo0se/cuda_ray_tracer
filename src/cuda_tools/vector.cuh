@@ -5,6 +5,8 @@
 
 namespace cuda_tools
 {
+// Vector to store dynamic objects and have their vtable abailable in kernels.
+// Elements are stored in gpu memory.
 template <typename T>
 class Vector
 {
@@ -38,6 +40,9 @@ class Vector
 
     // Get the current size of the vector
     inline int32_t size_get() const;
+
+    // Get back of the vector
+    const T* back_get() const;
 
   private:
     // Array

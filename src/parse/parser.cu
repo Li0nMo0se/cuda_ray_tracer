@@ -1,12 +1,14 @@
 #include "parser.cuh"
 
 #include "color/texture_material.cuh"
+#include "color/uniform_texture.cuh"
 #include "scene/camera.cuh"
 #include "space/vector.cuh"
 
 #include <cmath>
 #include <fstream>
 #include <sstream>
+#include <unordered_map>
 
 namespace parse
 {
@@ -38,6 +40,36 @@ static space::Vector3 parse_vector(std::string str)
     // ignore ')'
 
     return space::Vector3(x, y, z);
+}
+
+/* Parse an Uniform Texture */
+void parse_texture(
+    const std::string& line,
+    scene::Scene::textures_t& textures,
+    std::unordered_map<std::string, const color::TextureMaterial*>&
+        name_to_texture)
+{
+    std::stringstream ss(line);
+    std::string texture_type;
+    ss >> texture_type; // UniformTexture
+    std::string texture_name;
+    ss >> texture_name;
+
+    std::string color_str;
+    ss >> color_str;
+    const color::Color3 color = parse_vector(color_str);
+
+    float kd, ks, ns;
+    ss >> kd >> ks >> ns;
+
+    if (name_to_texture.find(texture_name) ==
+        name_to_texture.end()) // Not found
+    {
+        textures.emplace_back<color::UniformTexture>(color, kd, ks, ns);
+        name_to_texture.insert({texture_name, textures.back_get()});
+    }
+    // else
+    // FIXME: Parse error if textures already exists
 }
 
 /* Parse a line which describe the camera */
@@ -92,6 +124,9 @@ scene::Scene parse_scene(const std::string& filename)
     scene::Scene::lights_t lights;
     scene::Scene::textures_t textures;
 
+    std::unordered_map<std::string, const color::TextureMaterial*>
+        name_to_texture;
+
     while (std::getline(in, line))
     {
         if (!(line.empty() || line[0] == '#'))
@@ -99,6 +134,9 @@ scene::Scene parse_scene(const std::string& filename)
             std::stringstream ss(line);
             std::string curr_token;
             ss >> curr_token;
+            if (curr_token == "UniformTexture")
+                parse_texture(line, textures, name_to_texture);
+            // else
             //   throw ParseError("Undefined structure: " + curr_token,
             //                    nb_line_);
         }

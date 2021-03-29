@@ -7,10 +7,10 @@ namespace color
 class UniformTexture final : public TextureMaterial
 {
   public:
-    UniformTexture(const Color3 colors,
-                   const float kd,
-                   const float ks,
-                   const float ns)
+    __host__ __device__ UniformTexture(const Color3 colors,
+                                       const float kd,
+                                       const float ks,
+                                       const float ns)
         : colors_(colors)
         , kd_(kd)
         , ks_(ks)
@@ -21,16 +21,26 @@ class UniformTexture final : public TextureMaterial
     UniformTexture(const UniformTexture&) = default;
     UniformTexture& operator=(const UniformTexture&) = default;
 
-    color::Color3 get_color(const space::Point3&) const override
+    __host__ __device__ color::Color3
+    get_color(const space::Point3&) const override
     {
         return colors_;
     }
 
-    float get_kd(const space::Point3&) const override { return kd_; }
+    __host__ __device__ float get_kd(const space::Point3&) const override
+    {
+        return kd_;
+    }
 
-    float get_ks(const space::Point3&) const override { return ks_; }
+    __host__ __device__ float get_ks(const space::Point3&) const override
+    {
+        return ks_;
+    }
 
-    float get_ns(const space::Point3&) const override { return ns_; }
+    __host__ __device__ float get_ns(const space::Point3&) const override
+    {
+        return ns_;
+    }
 
   private:
     color::Color3 colors_;

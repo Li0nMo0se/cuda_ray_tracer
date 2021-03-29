@@ -101,4 +101,13 @@ inline int32_t Vector<T>::size_get() const
     return size_;
 }
 
+template <typename T>
+const T* Vector<T>::back_get() const
+{
+    if (size_ == 0)
+        return nullptr;
+
+    return data_[size_ - 1];
+}
+
 } // namespace cuda_tools
