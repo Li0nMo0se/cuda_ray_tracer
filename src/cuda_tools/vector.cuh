@@ -18,6 +18,14 @@ class Vector
     // Deep destructor
     ~Vector();
 
+    // Define copy as move constructor to avoid loose of ownership and multiple
+    // delete (Can't duplicate vector)
+    Vector(Vector& other);
+    // Move copy constructor. Move the ownership.
+    Vector(Vector&& other);
+
+    Vector& operator=(const Vector&) = delete;
+
     // Upgrade the capacity of the vector
     void realloc(const int32_t new_capacity);
 
@@ -33,7 +41,7 @@ class Vector
 
   private:
     // Array
-    T** data_ = nullptr;
+    T** __restrict__ data_ = nullptr;
 
     // Use signed int32_tegers instead of unsigned int32_tegers because it is
     // handled more efficiently in kernels
