@@ -16,6 +16,7 @@ set(SRC
     src/parse/parser.cu
     src/rendering/engine.cu
     src/scene/camera.cu
+    src/scene/sphere.cu
 )
 
 set(SRC_TESTS
@@ -56,6 +57,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 # ---
 
 add_executable(${PROJECT_NAME} ${SRC})
+set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CUDA_ARCHITECTURES 35 50 72)
 
 message(STATUS "---")
