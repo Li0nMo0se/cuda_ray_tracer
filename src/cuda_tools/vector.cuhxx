@@ -13,11 +13,11 @@ __global__ static void _kernel_dealloc(T** const data, const int32_t size)
         delete data[i];
 }
 
-template <typename T, typename... Ts>
+template <typename T, typename SubT, typename... Ts>
 __global__ static void _kernel_add_object(T** const data, Ts... args)
 {
     // Data is already at the location in which the new element is stored
-    *data = new T{args...};
+    *data = new SubT{args...};
 }
 
 // FIXME: kernel to print
@@ -63,10 +63,11 @@ void Vector<T>::realloc(const int32_t new_capacity)
 }
 
 template <typename T>
-template <typename... Ts>
+template <typename SubT, typename... Ts>
 void Vector<T>::emplace_back(Ts&&... args)
 {
-    _kernel_add_object<<<1, 1>>>(&(data_[size_]), std::forward<Ts>(args)...);
+    _kernel_add_object<T, SubT>
+        <<<1, 1>>>(&(data_[size_]), std::forward<Ts>(args)...);
     ++size_;
 
     // Upgrade the capacity

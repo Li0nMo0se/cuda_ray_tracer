@@ -23,7 +23,9 @@ class Vector
 
     // Push back in the vector by constructing the object while pushing (no copy
     // is performed)
-    template <typename... Ts>
+    // SubT should be restricted with std::is_base_of. However, nvcc does not
+    // support concept yet.
+    template <typename SubT, typename... Ts>
     void emplace_back(Ts&&... args);
 
     // Get the current size of the vector

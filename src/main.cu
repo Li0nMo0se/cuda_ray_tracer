@@ -8,12 +8,15 @@
 int main(int argc, char* argv[])
 {
     if (argc != 2)
+    {
         std::cerr << "Usage: " << argv[0] << " filename" << std::endl;
+        return 1;
+    }
 
     // Cuda tools stuff
     cuda_tools::Vector<int> vect;
-    vect.emplace_back(10);
-    vect.emplace_back(20);
+    vect.emplace_back<int>(10);
+    vect.emplace_back<int>(20);
 
     cuda_safe_call(cudaDeviceSynchronize());
     check_error();
@@ -27,5 +30,5 @@ int main(int argc, char* argv[])
     parse::Parser parser;
     parser.parse_scene(argv[1]);
 
-    return 1;
+    return 0;
 }
