@@ -16,7 +16,6 @@ set(SRC
     src/parse/parser.cu
     src/rendering/engine.cu
     src/scene/camera.cu
-    src/scene/scene.cu
 )
 
 set(SRC_TESTS
