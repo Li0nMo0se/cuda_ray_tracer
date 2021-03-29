@@ -1,4 +1,4 @@
-#include "parser.hh"
+#include "parser.cuh"
 
 #include <fstream>
 #include <sstream>
@@ -29,10 +29,10 @@ void Parser::parse_scene(const std::string& filename)
         }
     }
 }
+
 void Parser::parse_vector(const std::string& vector)
 {
     std::string tmp = vector;
-    // TODO
     // A vector looks like this: (x,y,z)
     tmp.erase(0, 1); // skip '('
 
@@ -56,6 +56,6 @@ void Parser::parse_vector(const std::string& vector)
 
     // ignore ')'
 
-    std::cout << x << ' ' << y << ' ' << z << std::endl;
+    // return space::Vector3(x, y, z);
 }
 } // namespace parse

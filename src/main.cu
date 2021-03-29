@@ -1,7 +1,8 @@
 #include "cuda_tools/cuda_error.cuh"
 #include "cuda_tools/optional.hh"
 #include "cuda_tools/vector.cuh"
-#include "parse/parser.hh"
+#include "parse/parser.cuh"
+#include "space/vector.cuh"
 
 #include <iostream>
 
@@ -29,6 +30,12 @@ int main(int argc, char* argv[])
     // Parser
     parse::Parser parser;
     parser.parse_scene(argv[1]);
+
+    // Vector
+    space::Vector3 vect3(1.f, 2.f, 3.f);
+    vect3 = space::Vector3(2.f, 3.f, 4.f);
+
+    std::cout << vect3[0] << " " << vect3[1] << " " << vect3[2] << "\n";
 
     return 0;
 }

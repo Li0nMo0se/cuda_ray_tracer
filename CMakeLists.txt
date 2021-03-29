@@ -14,7 +14,7 @@ include_directories(src)
 set(SRC
     src/main.cu
 
-    src/parse/parser.cc
+    src/parse/parser.cu
 )
 
 set(SRC_TESTS
