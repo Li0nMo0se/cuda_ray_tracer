@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../scene/scene.cuh"
+#include "scene/scene.cuh"
 
 #include <string>
 

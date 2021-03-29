@@ -1,7 +1,8 @@
 #include "parser.cuh"
 
-#include "../scene/camera.cuh"
-#include "../space/vector.cuh"
+#include "color/texture_material.cuh"
+#include "scene/camera.cuh"
+#include "space/vector.cuh"
 
 #include <cmath>
 #include <fstream>
@@ -89,6 +90,7 @@ scene::Scene parse_scene(const std::string& filename)
 
     scene::Scene::objects_t objects;
     scene::Scene::lights_t lights;
+    scene::Scene::textures_t textures;
 
     while (std::getline(in, line))
     {
@@ -103,6 +105,6 @@ scene::Scene parse_scene(const std::string& filename)
         nb_line++;
     }
 
-    return scene::Scene(camera, objects, lights);
+    return scene::Scene(camera, objects, lights, textures);
 }
 } // namespace parse
