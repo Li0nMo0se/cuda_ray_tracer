@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../scene/camera.cuh"
+#include "../scene/scene.cuh"
 #include "../space/vector.cuh"
 
 #include <string>
@@ -17,7 +18,7 @@ class Parser
     Parser& operator=(const Parser&) = delete;
 
     // FIXME: return scene
-    void parse_scene(const std::string& filename);
+    scene::Scene parse_scene(const std::string& filename);
 
   private:
     scene::Camera parse_camera(const std::string& line);

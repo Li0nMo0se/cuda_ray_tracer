@@ -1,11 +1,13 @@
 #include "parser.cuh"
 
+#include <cmath>
 #include <fstream>
 #include <sstream>
 
 namespace parse
 {
-void Parser::parse_scene(const std::string& filename)
+
+scene::Scene Parser::parse_scene(const std::string& filename)
 {
     int32_t nb_line = 1;
     std::ifstream in(filename);
@@ -16,7 +18,6 @@ void Parser::parse_scene(const std::string& filename)
     }
 
     // File is valid
-
     // Parse Camera first
     std::string line;
     while (std::getline(in, line))
@@ -27,6 +28,9 @@ void Parser::parse_scene(const std::string& filename)
     }
     // FIXME: Error if camera not found
     scene::Camera camera = parse_camera(line);
+
+    scene::Scene::objects_t objects;
+    scene::Scene::lights_t lights;
 
     while (std::getline(in, line))
     {
@@ -41,7 +45,7 @@ void Parser::parse_scene(const std::string& filename)
         nb_line++;
     }
 
-    // Scene(camera, std::move(objects_), std::move(lights_));
+    return scene::Scene(camera, objects, lights);
 }
 
 /* Parse a line which describe the camera */

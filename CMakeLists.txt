@@ -14,6 +14,7 @@ include_directories(src)
 set(SRC
     src/main.cu
     src/parse/parser.cu
+    src/rendering/engine.cu
     src/scene/camera.cu
     src/scene/scene.cu
 )

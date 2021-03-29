@@ -1,41 +1,42 @@
-#include "cuda_tools/cuda_error.cuh"
-#include "cuda_tools/optional.hh"
-#include "cuda_tools/vector.cuh"
 #include "parse/parser.cuh"
-#include "space/vector.cuh"
-
+#include "rendering/engine.cuh"
+#include "scene/scene.cuh"
 #include <iostream>
+#include <sstream>
+#include <string>
 
 int main(int argc, char* argv[])
 {
-    if (argc != 2)
+    if (argc != 7)
     {
-        std::cerr << "Usage: " << argv[0] << " filename" << std::endl;
-        return 1;
+        std::cerr << "Usage: " << argv[0]
+                  << " file.scene outputfile.ppm width height aliasing_level "
+                  << "reflection_max_depth\n";
+        return EXIT_FAILURE;
     }
+    uint32_t width;
+    std::stringstream ss_width(argv[3]);
+    ss_width >> width;
 
-    // Cuda tools stuff
-    cuda_tools::Vector<int> vect;
-    vect.emplace_back<int>(10);
-    vect.emplace_back<int>(20);
+    uint32_t height;
+    std::stringstream ss_height(argv[4]);
+    ss_height >> height;
 
-    cuda_safe_call(cudaDeviceSynchronize());
-    check_error();
+    uint32_t aliasing_level;
+    std::stringstream ss_aliasing(argv[5]);
+    ss_aliasing >> aliasing_level;
 
-    cuda_tools::Optional<int> a = cuda_tools::nullopt;
-    std::cout << std::boolalpha << a.has_value() << std::endl;
-    a = 2;
-    std::cout << std::boolalpha << a.has_value() << ' ' << *a << std::endl;
+    uint32_t reflection_max_depth;
+    std::stringstream ss_reflection(argv[6]);
+    ss_reflection >> reflection_max_depth;
 
-    // Parser
     parse::Parser parser;
-    parser.parse_scene(argv[1]);
-
-    // Vector
-    space::Vector3 vect3(1.f, 2.f, 3.f);
-    vect3 = space::Vector3(2.f, 3.f, 4.f);
-
-    std::cout << vect3[0] << " " << vect3[1] << " " << vect3[2] << "\n";
-
-    return 0;
+    scene::Scene scene = parser.parse_scene(argv[1]);
+    rendering::Engine::render(argv[2],
+                              width,
+                              height,
+                              scene,
+                              aliasing_level,
+                              reflection_max_depth);
+    return EXIT_SUCCESS;
 }
