@@ -11,7 +11,7 @@ constexpr float epsilone = 1e-6;
 class Object
 {
   public:
-    Object(const color::TextureMaterial* const texture)
+    __host__ __device__ Object(const color::TextureMaterial* const texture)
         : texture_(texture)
     {
     }
@@ -28,7 +28,10 @@ class Object
                       const space::IntersectionInfo& intersection) const = 0;
      */
 
-    const color::TextureMaterial& get_texture() const { return *texture_; }
+    __host__ __device__ const color::TextureMaterial& get_texture() const
+    {
+        return *texture_;
+    }
 
   protected:
     const color::TextureMaterial* const texture_;

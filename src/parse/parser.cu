@@ -3,6 +3,7 @@
 #include "color/texture_material.cuh"
 #include "color/uniform_texture.cuh"
 #include "scene/camera.cuh"
+#include "scene/sphere.cuh"
 #include "space/vector.cuh"
 
 #include <cmath>
@@ -12,7 +13,10 @@
 
 namespace parse
 {
+using map_texture_t =
+    std::unordered_map<std::string, const color::TextureMaterial*>;
 
+/*** Vector ***/
 /* Parse a vector of 3 coordinates */
 static space::Vector3 parse_vector(std::string str)
 {
@@ -42,12 +46,11 @@ static space::Vector3 parse_vector(std::string str)
     return space::Vector3(x, y, z);
 }
 
+/*** Texture ***/
 /* Parse an Uniform Texture */
-void parse_texture(
-    const std::string& line,
-    scene::Scene::textures_t& textures,
-    std::unordered_map<std::string, const color::TextureMaterial*>&
-        name_to_texture)
+static void parse_texture(const std::string& line,
+                          scene::Scene::textures_t& textures,
+                          map_texture_t& name_to_texture)
 {
     std::stringstream ss(line);
     std::string texture_type;
@@ -71,7 +74,18 @@ void parse_texture(
     // else
     // FIXME: Parse error if textures already exists
 }
-
+static const color::TextureMaterial*
+get_texture(std::stringstream& ss, const map_texture_t& name_to_texture)
+{
+    std::string texture_name;
+    ss >> texture_name;
+    auto it = name_to_texture.find(texture_name);
+    // FIXME:
+    // if (it == name_to_texture.end())
+    //    throw ParseError("No such texture " + texture_name, nb_line_);
+    return it->second;
+}
+/*** Camera ***/
 /* Parse a line which describe the camera */
 static scene::Camera parse_camera(const std::string& line)
 {
@@ -96,6 +110,26 @@ static scene::Camera parse_camera(const std::string& line)
     beta = beta * M_PI / 180.f;
 
     return scene::Camera(origin, y_axis, z_axis, z_min, alpha, beta);
+}
+
+static void parse_sphere(const std::string& line,
+                         scene::Scene::objects_t& objects,
+                         map_texture_t& name_to_texture)
+{
+    std::stringstream ss(line);
+    std::string tmp;
+    ss >> tmp; // Sphere
+
+    std::string origin_str;
+    ss >> origin_str;
+    const space::Vector3 origin = parse_vector(origin_str);
+
+    float radius;
+    ss >> radius;
+
+    const color::TextureMaterial* const texture =
+        get_texture(ss, name_to_texture);
+    objects.emplace_back<scene::Sphere>(origin, radius, texture);
 }
 
 scene::Scene parse_scene(const std::string& filename)
@@ -124,8 +158,7 @@ scene::Scene parse_scene(const std::string& filename)
     scene::Scene::lights_t lights;
     scene::Scene::textures_t textures;
 
-    std::unordered_map<std::string, const color::TextureMaterial*>
-        name_to_texture;
+    map_texture_t name_to_texture;
 
     while (std::getline(in, line))
     {
@@ -136,6 +169,8 @@ scene::Scene parse_scene(const std::string& filename)
             ss >> curr_token;
             if (curr_token == "UniformTexture")
                 parse_texture(line, textures, name_to_texture);
+            else if (curr_token == "Sphere")
+                parse_sphere(line, objects, name_to_texture);
             // else
             //   throw ParseError("Undefined structure: " + curr_token,
             //                    nb_line_);
