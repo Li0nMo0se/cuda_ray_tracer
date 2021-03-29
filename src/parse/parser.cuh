@@ -1,5 +1,8 @@
 #pragma once
 
+#include "../scene/camera.cuh"
+#include "../space/vector.cuh"
+
 #include <string>
 
 namespace parse
@@ -17,10 +20,8 @@ class Parser
     void parse_scene(const std::string& filename);
 
   private:
-    // FIXME: return space::Vector3
-    void parse_vector(const std::string& vector);
+    scene::Camera parse_camera(const std::string& line);
 
-  private:
-    int32_t nb_line_ = 0;
+    space::Vector3 parse_vector(const std::string& vector);
 };
 } // namespace parse

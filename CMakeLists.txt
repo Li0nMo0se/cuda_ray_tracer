@@ -13,8 +13,9 @@ include_directories(src)
 
 set(SRC
     src/main.cu
-
     src/parse/parser.cu
+    src/scene/camera.cu
+    src/scene/scene.cu
 )
 
 set(SRC_TESTS
