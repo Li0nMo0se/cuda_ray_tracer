@@ -1,5 +1,8 @@
 #include "parser.cuh"
 
+#include "../scene/camera.cuh"
+#include "../space/vector.cuh"
+
 #include <cmath>
 #include <fstream>
 #include <sstream>
@@ -7,7 +10,62 @@
 namespace parse
 {
 
-scene::Scene Parser::parse_scene(const std::string& filename)
+/* Parse a vector of 3 coordinates */
+static space::Vector3 parse_vector(std::string str)
+{
+    // A vector looks like this: (x,y,z)
+    str.erase(0, 1); // skip '('
+
+    float x;
+    std::stringstream ss_x(str);
+    ss_x >> x; // x
+
+    std::getline(ss_x, str); // get the rest of the streamstring
+    str.erase(0, 1); // skip ','
+
+    float y;
+    std::stringstream ss_y(str);
+    ss_y >> y; // y
+
+    std::getline(ss_y, str); // get the rest of the streamstring
+    str.erase(0, 1); // skip ','
+
+    float z;
+    std::stringstream ss_z(str);
+    ss_z >> z; // z
+
+    // ignore ')'
+
+    return space::Vector3(x, y, z);
+}
+
+/* Parse a line which describe the camera */
+static scene::Camera parse_camera(const std::string& line)
+{
+    std::stringstream ss(line);
+    std::string tmp;
+    ss >> tmp;
+    ss >> tmp;
+    const space::Vector3 origin = parse_vector(tmp);
+    ss >> tmp;
+    const space::Vector3 y_axis = parse_vector(tmp);
+    ss >> tmp;
+    const space::Vector3 z_axis = parse_vector(tmp);
+    float z_min;
+    ss >> z_min;
+    float alpha;
+    ss >> alpha;
+    // convert to radian
+    alpha = alpha * M_PI / 180.f;
+    float beta;
+    ss >> beta;
+    // convert to radian
+    beta = beta * M_PI / 180.f;
+
+    return scene::Camera(origin, y_axis, z_axis, z_min, alpha, beta);
+}
+
+scene::Scene parse_scene(const std::string& filename)
 {
     int32_t nb_line = 1;
     std::ifstream in(filename);
@@ -46,60 +104,5 @@ scene::Scene Parser::parse_scene(const std::string& filename)
     }
 
     return scene::Scene(camera, objects, lights);
-}
-
-/* Parse a line which describe the camera */
-scene::Camera Parser::parse_camera(const std::string& line)
-{
-    std::stringstream ss(line);
-    std::string tmp;
-    ss >> tmp;
-    ss >> tmp;
-    const space::Vector3 origin = parse_vector(tmp);
-    ss >> tmp;
-    const space::Vector3 y_axis = parse_vector(tmp);
-    ss >> tmp;
-    const space::Vector3 z_axis = parse_vector(tmp);
-    float z_min;
-    ss >> z_min;
-    float alpha;
-    ss >> alpha;
-    // convert to radian
-    alpha = alpha * M_PI / 180.f;
-    float beta;
-    ss >> beta;
-    // convert to radian
-    beta = beta * M_PI / 180.f;
-
-    return scene::Camera(origin, y_axis, z_axis, z_min, alpha, beta);
-}
-
-space::Vector3 Parser::parse_vector(const std::string& vector)
-{
-    std::string tmp = vector;
-    // A vector looks like this: (x,y,z)
-    tmp.erase(0, 1); // skip '('
-
-    float x;
-    std::stringstream ss_x(tmp);
-    ss_x >> x; // x
-
-    std::getline(ss_x, tmp); // get the rest of the streamstring
-    tmp.erase(0, 1); // skip ','
-
-    float y;
-    std::stringstream ss_y(tmp);
-    ss_y >> y; // y
-
-    std::getline(ss_y, tmp); // get the rest of the streamstring
-    tmp.erase(0, 1); // skip ','
-
-    float z;
-    std::stringstream ss_z(tmp);
-    ss_z >> z; // z
-
-    // ignore ')'
-
-    return space::Vector3(x, y, z);
 }
 } // namespace parse

@@ -30,8 +30,7 @@ int main(int argc, char* argv[])
     std::stringstream ss_reflection(argv[6]);
     ss_reflection >> reflection_max_depth;
 
-    parse::Parser parser;
-    scene::Scene scene = parser.parse_scene(argv[1]);
+    scene::Scene scene = parse::parse_scene(argv[1]);
     rendering::Engine::render(argv[2],
                               width,
                               height,
