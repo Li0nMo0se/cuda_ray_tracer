@@ -2,24 +2,28 @@
 
 namespace cuda_tools
 {
-struct nullopt
+struct _nullopt
 {
-    explicit constexpr nullopt() {}
-};
+    explicit constexpr _nullopt() {}
+} nullopt;
 
 template <typename T>
 class Optional
 {
   public:
-  public:
-    Optional(const T& value)
+    constexpr Optional(const T& value)
         : is_set_(true)
         , value_(value)
     {
     }
 
-    constexpr Optional(nullopt) noexcept
+    constexpr Optional(_nullopt) noexcept
         : is_set_(false)
+    {
+    }
+
+    constexpr Optional() noexcept
+        : Optional(nullopt)
     {
     }
 

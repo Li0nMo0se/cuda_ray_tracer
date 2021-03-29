@@ -7,14 +7,14 @@ namespace cuda_tools
 namespace
 {
 template <typename T>
-__global__ void kernel_dealloc(T** const data, const int32_t size)
+__global__ static void _kernel_dealloc(T** const data, const int32_t size)
 {
     for (int32_t i = 0; i < size; i++)
         delete data[i];
 }
 
 template <typename T, typename... Ts>
-__global__ void kernel_add_object(T** const data, Ts... args)
+__global__ static void _kernel_add_object(T** const data, Ts... args)
 {
     // Data is already at the location in which the new element is stored
     *data = new T{args...};
@@ -39,7 +39,7 @@ Vector<T>::Vector(int32_t capacity)
 template <typename T>
 Vector<T>::~Vector()
 {
-    kernel_dealloc<<<1, 1>>>(data_, size_);
+    _kernel_dealloc<<<1, 1>>>(data_, size_);
     cuda_safe_call(cudaFree(data_));
 }
 
@@ -66,7 +66,7 @@ template <typename T>
 template <typename... Ts>
 void Vector<T>::emplace_back(Ts&&... args)
 {
-    kernel_add_object<<<1, 1>>>(&(data_[size_]), std::forward<Ts>(args)...);
+    _kernel_add_object<<<1, 1>>>(&(data_[size_]), std::forward<Ts>(args)...);
     ++size_;
 
     // Upgrade the capacity

@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
     cuda_safe_call(cudaDeviceSynchronize());
     check_error();
 
-    cuda_tools::Optional<int> a = cuda_tools::nullopt{};
+    cuda_tools::Optional<int> a = cuda_tools::nullopt;
     std::cout << std::boolalpha << a.has_value() << std::endl;
     a = 2;
     std::cout << std::boolalpha << a.has_value() << ' ' << *a << std::endl;
