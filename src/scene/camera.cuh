@@ -21,20 +21,20 @@ class Camera final
 
   private:
     // Origin of the camera `C`
-    const space::Vector3 origin_;
+    space::Vector3 origin_;
 
     // Three axis of the camera
     // Unit vectors
-    const space::Vector3 x_axis_;
-    const space::Vector3 y_axis_;
-    const space::Vector3 z_axis_;
+    space::Vector3 x_axis_;
+    space::Vector3 y_axis_;
+    space::Vector3 z_axis_;
 
     // Focal distance
-    const float z_min_;
+    float z_min_;
 
     // alpha angle
-    const float alpha_;
+    float alpha_;
     // beta angle
-    const float beta_;
+    float beta_;
 };
 } // namespace scene

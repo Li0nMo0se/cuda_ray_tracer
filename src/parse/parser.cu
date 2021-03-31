@@ -8,6 +8,7 @@
 
 #include <cmath>
 #include <fstream>
+#include <optional>
 #include <sstream>
 #include <unordered_map>
 
@@ -50,7 +51,8 @@ static space::Vector3 parse_vector(std::string str)
 /* Parse an Uniform Texture */
 static void parse_texture(const std::string& line,
                           scene::Scene::textures_t& textures,
-                          map_texture_t& name_to_texture)
+                          map_texture_t& name_to_texture,
+                          const int32_t nb_line)
 {
     std::stringstream ss(line);
     std::string texture_type;
@@ -71,18 +73,20 @@ static void parse_texture(const std::string& line,
         textures.emplace_back<color::UniformTexture>(color, kd, ks, ns);
         name_to_texture.insert({texture_name, textures.back_get()});
     }
-    // else
-    // FIXME: Parse error if textures already exists
+    else
+        throw ParseError("Redefinition of " + texture_name, nb_line);
 }
+
 static const color::TextureMaterial*
-get_texture(std::stringstream& ss, const map_texture_t& name_to_texture)
+get_texture(std::stringstream& ss,
+            const map_texture_t& name_to_texture,
+            const int32_t nb_line)
 {
     std::string texture_name;
     ss >> texture_name;
     auto it = name_to_texture.find(texture_name);
-    // FIXME:
-    // if (it == name_to_texture.end())
-    //    throw ParseError("No such texture " + texture_name, nb_line_);
+    if (it == name_to_texture.end())
+        throw ParseError("No such texture " + texture_name, nb_line);
     return it->second;
 }
 /*** Camera ***/
@@ -91,12 +95,12 @@ static scene::Camera parse_camera(const std::string& line)
 {
     std::stringstream ss(line);
     std::string tmp;
-    ss >> tmp;
-    ss >> tmp;
+    ss >> tmp; // Camera
+    ss >> tmp; // origin
     const space::Vector3 origin = parse_vector(tmp);
-    ss >> tmp;
+    ss >> tmp; // y_axis
     const space::Vector3 y_axis = parse_vector(tmp);
-    ss >> tmp;
+    ss >> tmp; // z_axis
     const space::Vector3 z_axis = parse_vector(tmp);
     float z_min;
     ss >> z_min;
@@ -114,7 +118,8 @@ static scene::Camera parse_camera(const std::string& line)
 
 static void parse_sphere(const std::string& line,
                          scene::Scene::objects_t& objects,
-                         map_texture_t& name_to_texture)
+                         map_texture_t& name_to_texture,
+                         const int32_t nb_line)
 {
     std::stringstream ss(line);
     std::string tmp;
@@ -128,7 +133,7 @@ static void parse_sphere(const std::string& line,
     ss >> radius;
 
     const color::TextureMaterial* const texture =
-        get_texture(ss, name_to_texture);
+        get_texture(ss, name_to_texture, nb_line);
     objects.emplace_back<scene::Sphere>(origin, radius, texture);
 }
 
@@ -151,8 +156,8 @@ scene::Scene parse_scene(const std::string& filename)
         if (!(line.empty() || line[0] == '#'))
             break;
     }
-    // FIXME: Error if camera not found
-    scene::Camera camera = parse_camera(line);
+
+    std::optional<scene::Camera> camera;
 
     scene::Scene::objects_t objects;
     scene::Scene::lights_t lights;
@@ -167,17 +172,21 @@ scene::Scene parse_scene(const std::string& filename)
             std::stringstream ss(line);
             std::string curr_token;
             ss >> curr_token;
+            if (curr_token == "Camera")
+                camera = parse_camera(line);
             if (curr_token == "UniformTexture")
-                parse_texture(line, textures, name_to_texture);
+                parse_texture(line, textures, name_to_texture, nb_line);
             else if (curr_token == "Sphere")
-                parse_sphere(line, objects, name_to_texture);
-            // else
-            //   throw ParseError("Undefined structure: " + curr_token,
-            //                    nb_line_);
+                parse_sphere(line, objects, name_to_texture, nb_line);
+            else
+                throw ParseError("Undefined structure: " + curr_token, nb_line);
         }
         nb_line++;
     }
 
-    return scene::Scene(camera, objects, lights, textures);
+    if (!camera)
+        throw ParseError("Camera is missing", nb_line);
+
+    return scene::Scene(camera.value(), objects, lights, textures);
 }
 } // namespace parse

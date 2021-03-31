@@ -6,9 +6,20 @@
 
 namespace parse
 {
-// FIXME: Easier if parser is actually a class?
-// Would be able to store objects, textures, name_to_texture, nb lines and not
-// having to give arguments everytime. I think it will lead to a cleaner code
-// (?)
+class ParseError : public std::exception
+{
+  public:
+    ParseError(const std::string& msg, const unsigned int nb_line)
+        : msg_("Line " + std::to_string(nb_line) + ": " + msg)
+    {
+    }
+
+    virtual const char* what() const noexcept { return msg_.c_str(); }
+
+  private:
+    const std::string msg_;
+};
+
+/* Read a file and return the scene according to the description in the file */
 scene::Scene parse_scene(const std::string& filename);
 } // namespace parse
