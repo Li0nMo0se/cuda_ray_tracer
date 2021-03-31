@@ -20,6 +20,13 @@ __global__ static void _kernel_add_object(T** const data, Ts... args)
     *data = new SubT{args...};
 }
 
+template <typename T>
+__global__ static void
+_kernel_back_get(T** const data, const int32_t size, T** res)
+{
+    *res = data[size - 1];
+}
+
 // FIXME: kernel to print
 } // namespace
 
@@ -106,8 +113,9 @@ const T* Vector<T>::back_get() const
 {
     if (size_ == 0)
         return nullptr;
-
-    return data_[size_ - 1];
+    T* res;
+    _kernel_back_get<<<1, 1>>>(data_, size_, &res);
+    return res;
 }
 
 } // namespace cuda_tools
