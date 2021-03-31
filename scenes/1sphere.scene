@@ -1,0 +1,4 @@
+Camera (0,0,0) (0,1,0) (0,0,1) 1 45 45
+UniformTexture red (255,0,0) 2 15 1
+Sphere (0,0,2) 1 red
+PointLight (0,1,0) 1

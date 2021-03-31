@@ -3,6 +3,7 @@
 #include "color/texture_material.cuh"
 #include "color/uniform_texture.cuh"
 #include "scene/camera.cuh"
+#include "scene/point_light.cuh"
 #include "scene/sphere.cuh"
 #include "space/vector.cuh"
 
@@ -116,6 +117,24 @@ static scene::Camera parse_camera(const std::string& line)
     return scene::Camera(origin, y_axis, z_axis, z_min, alpha, beta);
 }
 
+/*** Parse lights ***/
+static void parse_pointlight(const std::string& line,
+                             scene::Scene::lights_t& lights)
+{
+    std::stringstream ss(line);
+    std::string tmp;
+    ss >> tmp; // PointLight
+
+    std::string origin_str;
+    ss >> origin_str;
+    space::Vector3 origin = parse_vector(origin_str);
+
+    float intensity;
+    ss >> intensity;
+    lights.emplace_back<scene::PointLight>(origin, intensity);
+}
+
+/*** Parse objects ***/
 static void parse_sphere(const std::string& line,
                          scene::Scene::objects_t& objects,
                          map_texture_t& name_to_texture,
@@ -148,15 +167,6 @@ scene::Scene parse_scene(const std::string& filename)
     }
 
     // File is valid
-    // Parse Camera first
-    std::string line;
-    while (std::getline(in, line))
-    {
-        nb_line++;
-        if (!(line.empty() || line[0] == '#'))
-            break;
-    }
-
     std::optional<scene::Camera> camera;
 
     scene::Scene::objects_t objects;
@@ -165,6 +175,7 @@ scene::Scene parse_scene(const std::string& filename)
 
     map_texture_t name_to_texture;
 
+    std::string line;
     while (std::getline(in, line))
     {
         if (!(line.empty() || line[0] == '#'))
@@ -174,10 +185,12 @@ scene::Scene parse_scene(const std::string& filename)
             ss >> curr_token;
             if (curr_token == "Camera")
                 camera = parse_camera(line);
-            if (curr_token == "UniformTexture")
+            else if (curr_token == "UniformTexture")
                 parse_texture(line, textures, name_to_texture, nb_line);
             else if (curr_token == "Sphere")
                 parse_sphere(line, objects, name_to_texture, nb_line);
+            else if (curr_token == "PointLight")
+                parse_pointlight(line, lights);
             else
                 throw ParseError("Undefined structure: " + curr_token, nb_line);
         }
