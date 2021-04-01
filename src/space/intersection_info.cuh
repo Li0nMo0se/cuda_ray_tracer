@@ -14,6 +14,13 @@ namespace space
 class IntersectionInfo
 {
   public:
+    __host__ __device__ IntersectionInfo()
+        : t_(cuda_tools::nullopt)
+        , obj_(cuda_tools::nullopt)
+        , intersection_(cuda_tools::nullopt)
+    {
+    }
+
     __host__ __device__ IntersectionInfo(const float t,
                                          const scene::Object& obj)
         : t_(t)
