@@ -16,8 +16,7 @@ class Object
     {
     }
 
-    virtual ~Object() = default;
-
+    __host__ __device__ virtual ~Object() {}
     /*
            // If no intersection return nullopt
            virtual std::optional<space::IntersectionInfo>

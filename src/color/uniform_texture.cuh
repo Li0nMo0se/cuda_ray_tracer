@@ -18,9 +18,6 @@ class UniformTexture final : public TextureMaterial
     {
     }
 
-    UniformTexture(const UniformTexture&) = default;
-    UniformTexture& operator=(const UniformTexture&) = default;
-
     __host__ __device__ color::Color3
     get_color(const space::Point3&) const override
     {

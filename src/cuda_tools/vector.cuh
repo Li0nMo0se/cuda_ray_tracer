@@ -2,7 +2,6 @@
 
 #include "cuda_error.cuh"
 #include <cuda_runtime.h>
-
 namespace cuda_tools
 {
 // Vector to store dynamic objects and have their vtable abailable in kernels.

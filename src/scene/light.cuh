@@ -11,11 +11,7 @@ class Light
         , intensity_(intensity)
     {
     }
-
-    virtual ~Light() = default;
-    Light(const Light&) = default;
-    Light& operator=(const Light&) = default;
-
+    __host__ __device__ ~Light() {}
     __host__ __device__ float intensity_get() const { return intensity_; }
     __host__ __device__ const space::Point3& origin_get() const
     {

@@ -13,10 +13,5 @@ class PointLight final : public Light
         : Light(origin, intensity)
     {
     }
-
-    virtual ~PointLight() = default;
-
-    PointLight(const PointLight&) = default;
-    virtual PointLight& operator=(const PointLight&) = default;
 };
 } // namespace scene

@@ -19,7 +19,6 @@ __global__ static void _kernel_add_object(T** const data, Ts... args)
     // Data is already at the location in which the new element is stored
     *data = new SubT{args...};
 }
-// FIXME: kernel to print
 } // namespace
 
 template <typename T>
@@ -38,14 +37,12 @@ Vector<T>::Vector(int32_t capacity)
 template <typename T>
 Vector<T>::~Vector()
 {
-    /*
     if (data_)
     {
         cuda_safe_call(cudaDeviceSynchronize());
         _kernel_dealloc<<<1, 1>>>(data_, size_);
-        // cuda_safe_call(cudaDeviceSynchronize());
-        // cuda_safe_call(cudaFree(data_));
-    }*/
+        cuda_safe_call(cudaFree(data_));
+    }
 }
 
 template <typename T>
@@ -57,6 +54,8 @@ Vector<T>::Vector(Vector& other)
 template <typename T>
 Vector<T>::Vector(Vector&& other)
 {
+    cuda_safe_call(cudaDeviceSynchronize());
+
     // Copy fields
     size_ = other.size_;
     capacity_ = other.capacity_;

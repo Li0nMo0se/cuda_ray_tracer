@@ -8,10 +8,8 @@ class TextureMaterial
 {
   public:
     TextureMaterial() = default;
-    virtual ~TextureMaterial() = default;
 
-    TextureMaterial(const TextureMaterial&) = default;
-    TextureMaterial& operator=(const TextureMaterial&) = default;
+    __host__ __device__ ~TextureMaterial() {}
 
     __host__ __device__ virtual Color3
     get_color(const space::Point3&) const = 0;
