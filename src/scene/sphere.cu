@@ -12,5 +12,19 @@ Sphere::Sphere(const space::Point3& origin,
 {
 }
 
+cuda_tools::Optional<space::IntersectionInfo>
+Sphere::intersect(const space::Ray& ray) const
+{
+    // TODO
+    return cuda_tools::nullopt;
+}
+
+space::Vector3
+Sphere::normal_get(const space::Ray&,
+                   const space::IntersectionInfo& intersection) const
+{
+    // TODO
+}
+
 // FIXME: intersection and get normal
 } // namespace scene

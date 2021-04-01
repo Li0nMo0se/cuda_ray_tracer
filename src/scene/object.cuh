@@ -1,6 +1,9 @@
 #pragma once
 
 #include "color/texture_material.cuh"
+#include "cuda_tools/optional.cuh"
+#include "space/intersection_info.cuh"
+#include "space/ray.cuh"
 
 namespace scene
 {
@@ -17,15 +20,14 @@ class Object
     }
 
     __host__ __device__ virtual ~Object() {}
-    /*
-           // If no intersection return nullopt
-           virtual std::optional<space::IntersectionInfo>
-           intersect(const space::Ray& ray) const = 0;
 
-           virtual space::Vector3
-           normal_get(const space::Ray& ray,
-                      const space::IntersectionInfo& intersection) const = 0;
-     */
+    // If no intersection return nullopt
+    __host__ __device__ virtual cuda_tools::Optional<space::IntersectionInfo>
+    intersect(const space::Ray& ray) const = 0;
+
+    __host__ __device__ virtual space::Vector3
+    normal_get(const space::Ray& ray,
+               const space::IntersectionInfo& intersection) const = 0;
 
     __host__ __device__ const color::TextureMaterial& get_texture() const
     {

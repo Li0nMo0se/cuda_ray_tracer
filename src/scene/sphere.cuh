@@ -12,15 +12,12 @@ class Sphere final : public Object
                                const float radius,
                                const color::TextureMaterial* const texture);
 
-    /*
-    // Return positive t value if intersection
-    virtual std::optional<space::IntersectionInfo>
+    __host__ __device__ virtual cuda_tools::Optional<space::IntersectionInfo>
     intersect(const space::Ray& ray) const override;
 
-    virtual space::Vector3
+    __host__ __device__ virtual space::Vector3
     normal_get(const space::Ray&,
-               const space::IntersectionInfo& intersection) const
-    override;*/
+               const space::IntersectionInfo& intersection) const override;
 
   private:
     const space::Point3 origin_;
