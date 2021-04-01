@@ -42,7 +42,7 @@ class Vector
     inline int32_t size_get() const;
 
     // Get back of the vector
-    const T* back_get() const;
+    T** back_get() const;
 
   private:
     // Array

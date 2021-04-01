@@ -19,14 +19,6 @@ __global__ static void _kernel_add_object(T** const data, Ts... args)
     // Data is already at the location in which the new element is stored
     *data = new SubT{args...};
 }
-
-template <typename T>
-__global__ static void
-_kernel_back_get(T** const data, const int32_t size, T** res)
-{
-    *res = data[size - 1];
-}
-
 // FIXME: kernel to print
 } // namespace
 
@@ -46,8 +38,14 @@ Vector<T>::Vector(int32_t capacity)
 template <typename T>
 Vector<T>::~Vector()
 {
-    _kernel_dealloc<<<1, 1>>>(data_, size_);
-    cuda_safe_call(cudaFree(data_));
+    /*
+    if (data_)
+    {
+        cuda_safe_call(cudaDeviceSynchronize());
+        _kernel_dealloc<<<1, 1>>>(data_, size_);
+        // cuda_safe_call(cudaDeviceSynchronize());
+        // cuda_safe_call(cudaFree(data_));
+    }*/
 }
 
 template <typename T>
@@ -108,13 +106,15 @@ inline int32_t Vector<T>::size_get() const
     return size_;
 }
 
+// FIXME: return const T** ?
 template <typename T>
-const T* Vector<T>::back_get() const
+T** Vector<T>::back_get() const
 {
+    cuda_safe_call(cudaDeviceSynchronize());
     if (size_ == 0)
         return nullptr;
-    T* res;
-    _kernel_back_get<<<1, 1>>>(data_, size_, &res);
+    T** res = new T*;
+    cudaMemcpy(res, data_ + size_ - 1, sizeof(T*), cudaMemcpyDeviceToHost);
     return res;
 }
 
