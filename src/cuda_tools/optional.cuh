@@ -2,11 +2,17 @@
 
 namespace cuda_tools
 {
-// FIXME: Is this really working? (for host & device memory?)
+/* FIXME: Is that alright is device and host memory?
+   Robert_Crovella said:
+   const int c = 500;
+   defined at global scope, should be visible to both host and device code
+   defined in that compilation unit.
+   It seems to be working because the global variable is const.
+*/
 extern struct _nullopt
 {
     explicit constexpr _nullopt() {}
-} nullopt;
+} const nullopt;
 
 template <typename T>
 class Optional
