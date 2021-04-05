@@ -45,6 +45,15 @@ inline uint32_t Image<T>::height_get() const
     return this->height_;
 }
 
+template <typename T>
+void Image<T>::copy(const Image<T>& copy_img, cudaMemcpyKind memcpy_kind)
+{
+    cuda_safe_call(cudaMemcpy(this->data_,
+                              copy_img.data_get(),
+                              sizeof(T) * this->width_ * this->height_,
+                              memcpy_kind));
+}
+
 /** DeviceImage **/
 template <typename T>
 DeviceImage<T>::DeviceImage(const uint32_t width, const uint32_t height)
@@ -52,6 +61,38 @@ DeviceImage<T>::DeviceImage(const uint32_t width, const uint32_t height)
 {
     cuda_safe_call(cudaMalloc((void**)&this->data_,
                               sizeof(T) * this->width_ * this->height_));
+}
+
+template <typename T>
+DeviceImage<T>::DeviceImage(const DeviceImage<T>& copy_device)
+    : DeviceImage<T>(copy_device.width_get(), copy_device.height_get())
+{
+    this->copy(copy_device, cudaMemcpyDeviceToDevice);
+}
+
+template <typename T>
+DeviceImage<T>::DeviceImage(const HostImage<T>& copy_host)
+    : DeviceImage<T>(copy_host.width_get(), copy_host.height_get())
+{
+    this->copy(copy_host, cudaMemcpyHostToDevice);
+}
+
+template <typename T>
+DeviceImage<T>& DeviceImage<T>::operator=(const DeviceImage<T>& copy_device)
+{
+    assert(this->width_ == copy_device.width_get() &&
+           this->height_ == copy_device.height_get());
+    this->copy(copy_device, cudaMemcpyDeviceToDevice);
+    return *this;
+}
+
+template <typename T>
+DeviceImage<T>& DeviceImage<T>::operator=(const HostImage<T>& copy_host)
+{
+    assert(this->width_ == copy_host.width_get() &&
+           this->height_ == copy_host.height_get());
+    this->copy(copy_host, cudaMemcpyHostToDevice);
+    return *this;
 }
 
 template <typename T>
@@ -66,48 +107,57 @@ void DeviceImage<T>::save(const std::string& filename) const
     // TODO
 }
 
-template <typename T>
-DeviceImage<T>::DeviceImage(const HostImage<T>& copy_host)
-    : Image<T>(copy_host.width_get(), copy_host.height_get())
-{
-    *this = copy_host; // copy data
-}
-
-template <typename T>
-DeviceImage<T>& DeviceImage<T>::operator=(const HostImage<T>& copy_host)
-{
-    assert(this->width_ == copy_host.width_get() &&
-           this->height == copy_host.height_get());
-
-    copy(copy_host, cudaMemcpyHostToDevice);
-}
-
-template <typename T>
-void DeviceImage<T>::copy(const Image<T>& copy_img, cudaMemcpyKind memcpy_kind)
-{
-    cudaMemcpy(this->data_,
-               copy_img.data_get(),
-               sizeof(T) * this->width_ * this->height_,
-               memcpy_kind);
-}
-
 /** Host Image **/
 template <typename T>
 HostImage<T>::HostImage(const uint32_t width, const uint32_t height)
     : Image<T>(width, height)
 {
-    this->data_ = new T[this->width_ * this->height_];
+    this->data_ =
+        static_cast<T*>(std::malloc(sizeof(T) * this->width_ * this->height_));
 }
 
 template <typename T>
 HostImage<T>::~HostImage()
 {
-    delete[] this->data_;
+    std::free(this->data_);
 }
 
 template <typename T>
-void HostImage<T>::save(const std::string filename) const
+void HostImage<T>::save(const std::string& filename) const
 {
     // TODO
 }
+
+template <typename T>
+HostImage<T>::HostImage(const HostImage& copy_host)
+    : HostImage(copy_host.width_get(), copy_host.height_get())
+{
+    this->copy(copy_host, cudaMemcpyHostToHost);
+}
+
+template <typename T>
+HostImage<T>::HostImage(const DeviceImage<T>& copy_device)
+    : HostImage(copy_device.width_get(), copy_device.height_get())
+{
+    this->copy(copy_device, cudaMemcpyDeviceToHost);
+}
+
+template <typename T>
+HostImage<T>& HostImage<T>::operator=(const HostImage& copy_host)
+{
+    assert(this->width_ == copy_host.width_get() &&
+           this->height_ == copy_host.height_get());
+    this->copy(copy_host, cudaMemcpyHostToHost);
+    return *this;
+}
+
+template <typename T>
+HostImage<T>& HostImage<T>::operator=(const DeviceImage<T>& copy_device)
+{
+    assert(this->width_ == copy_device.width_get() &&
+           this->height_ == copy_device.height_get());
+    this->copy(copy_device, cudaMemcpyDeviceToHost);
+    return *this;
+}
+
 } // namespace rendering
