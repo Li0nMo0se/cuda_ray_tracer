@@ -1,0 +1,113 @@
+#include "rendering/image.cuh"
+namespace rendering
+{
+/** Image **/
+template <typename T>
+Image<T>::Image(const uint32_t width, const uint32_t height)
+    : width_(width)
+    , height_(height)
+    , data_(nullptr)
+{
+}
+
+template <typename T>
+Image<T>::~Image()
+{
+}
+
+template <typename T>
+T& Image<T>::operator()(const uint32_t y, const uint32_t x)
+{
+    return data_[y * width_ + x];
+}
+
+template <typename T>
+const T& Image<T>::operator()(const uint32_t y, const uint32_t x) const
+{
+    return data_[y * width_ + x];
+}
+
+template <typename T>
+inline const T* Image<T>::data_get() const
+{
+    return this->data_;
+}
+
+template <typename T>
+inline uint32_t Image<T>::width_get() const
+{
+    return this->width_;
+}
+
+template <typename T>
+inline uint32_t Image<T>::height_get() const
+{
+    return this->height_;
+}
+
+/** DeviceImage **/
+template <typename T>
+DeviceImage<T>::DeviceImage(const uint32_t width, const uint32_t height)
+    : Image<T>(width, height)
+{
+    cuda_safe_call(cudaMalloc((void**)&this->data_,
+                              sizeof(T) * this->width_ * this->height_));
+}
+
+template <typename T>
+DeviceImage<T>::~DeviceImage()
+{
+    cuda_safe_call(cudaFree(this->data_));
+}
+
+template <typename T>
+void DeviceImage<T>::save(const std::string& filename) const
+{
+    // TODO
+}
+
+template <typename T>
+DeviceImage<T>::DeviceImage(const HostImage<T>& copy_host)
+    : Image<T>(copy_host.width_get(), copy_host.height_get())
+{
+    *this = copy_host; // copy data
+}
+
+template <typename T>
+DeviceImage<T>& DeviceImage<T>::operator=(const HostImage<T>& copy_host)
+{
+    assert(this->width_ == copy_host.width_get() &&
+           this->height == copy_host.height_get());
+
+    copy(copy_host, cudaMemcpyHostToDevice);
+}
+
+template <typename T>
+void DeviceImage<T>::copy(const Image<T>& copy_img, cudaMemcpyKind memcpy_kind)
+{
+    cudaMemcpy(this->data_,
+               copy_img.data_get(),
+               sizeof(T) * this->width_ * this->height_,
+               memcpy_kind);
+}
+
+/** Host Image **/
+template <typename T>
+HostImage<T>::HostImage(const uint32_t width, const uint32_t height)
+    : Image<T>(width, height)
+{
+    this->data_ = new T[this->width_ * this->height_];
+}
+
+template <typename T>
+HostImage<T>::~HostImage()
+{
+    delete[] this->data_;
+}
+
+template <typename T>
+void HostImage<T>::save(const std::string filename) const
+{
+    // TODO
+}
+} // namespace rendering

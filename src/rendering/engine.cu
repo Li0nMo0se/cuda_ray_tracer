@@ -1,7 +1,9 @@
-#include "engine.cuh"
+#include "rendering/engine.cuh"
+#include "rendering/image.cuh"
 
 namespace rendering
 {
+
 void Engine::render(const std::string& filename,
                     const uint32_t width,
                     const uint32_t height,
@@ -10,5 +12,6 @@ void Engine::render(const std::string& filename,
                     const uint32_t reflection_max_depth)
 {
     // TODO
+    DeviceImage<color::Color3> im(width, height);
 }
 } // namespace rendering
