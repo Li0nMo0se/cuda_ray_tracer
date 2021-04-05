@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
 project(raytracer LANGUAGES CUDA CXX)
 
-# find_package(GTest)
+find_package(GTest)
 
 message(STATUS "---")
 
@@ -20,7 +20,7 @@ set(SRC
 )
 
 set(SRC_TESTS
-    # tests/test_example.cc
+    tests/test_image.cu
 )
 
 # ---
@@ -63,5 +63,35 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 add_executable(${PROJECT_NAME} ${SRC})
 set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CUDA_ARCHITECTURES 35 50 72)
+
+# ---
+# Create targets for unit tests
+# ---
+
+if(${GTEST_FOUND})
+    message(STATUS "GTest enabled: unit tests will be generated")
+    enable_testing()
+
+    # For each test file create an executable of test. Launched using ctest
+    foreach(f IN LISTS SRC_TESTS)
+        # Find the test_name by deleting the extension and the parent_dir
+        string(REGEX REPLACE "\\.[^.]*$" "" F_WITHOUT_EXT ${f})
+        string(REGEX REPLACE "[^/]*/" "" TEST_NAME ${F_WITHOUT_EXT})
+
+        add_executable(${TEST_NAME} ${f})
+
+        set_target_properties(${TEST_NAME} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+        set_property(TARGET ${TEST_NAME} PROPERTY CUDA_ARCHITECTURES 35 50 72)
+        target_link_libraries(${TEST_NAME}
+            PRIVATE
+            ${GTEST_BOTH_LIBRARIES}
+            ${CMAKE_THREAD_LIBS_INIT})
+
+        add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+        set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 2)
+    endforeach()
+else()
+    message(STATUS "GTest disabled: unit tests will not be generated")
+endif()
 
 message(STATUS "---")

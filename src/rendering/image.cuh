@@ -1,5 +1,8 @@
 #pragma once
 
+#include "cuda_tools/cuda_error.cuh"
+#include <cstdint>
+#include <string>
 namespace rendering
 {
 
