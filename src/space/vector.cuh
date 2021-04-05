@@ -5,7 +5,7 @@
 namespace space
 {
 template <unsigned int size, typename T = float>
-class Vector
+class Vector final
 {
   protected:
     T vect_[size];
