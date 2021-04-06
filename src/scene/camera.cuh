@@ -19,7 +19,7 @@ class Camera final
 
     ~Camera() = default;
 
-  private:
+  public:
     // Origin of the camera `C`
     space::Vector3 origin_;
 

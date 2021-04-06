@@ -15,10 +15,10 @@ class Scene final
     using lights_t = cuda_tools::Vector<Light>;
     using textures_t = cuda_tools::Vector<color::TextureMaterial>;
 
-    Scene(const Camera& camera,
-          objects_t& objects,
-          lights_t& lights,
-          textures_t& textures)
+    __host__ __device__ Scene(const Camera& camera,
+                              objects_t& objects,
+                              lights_t& lights,
+                              textures_t& textures)
         : camera_(camera)
         , objects_(objects)
         , lights_(lights)
@@ -26,10 +26,10 @@ class Scene final
     {
     }
 
-    Scene(const Scene&) = delete;
-    Scene& operator=(const Scene&) = delete;
-
-    ~Scene() = default;
+    inline __host__ __device__ const Camera& camera_get() const
+    {
+        return camera_;
+    }
 
   private:
     // The unique camera of the scene
