@@ -19,14 +19,6 @@ class Image : public ISavable
 
     __host__ virtual ~Image();
 
-    // FIXME
-    /*
-    __host__ __device__ T& operator()(const int32_t y, const int32_t x);
-
-    __host__ __device__ const T& operator()(const int32_t y,
-                                            const int32_t x) const;
-    */
-
     __host__ __device__ inline const T* data_get() const;
     __host__ __device__ inline T* data_get();
     __host__ __device__ inline int32_t width_get() const;
@@ -82,7 +74,7 @@ class HostImage final : public Image<T>
 
     __host__ void free() override;
 
-    __host__ void save(const std::string& filename) const override;
+    __host__ inline void save(const std::string& filename) const override;
 };
 
 template <typename T>
