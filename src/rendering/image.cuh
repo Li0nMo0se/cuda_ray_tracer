@@ -28,7 +28,6 @@ class Image : public ISavable
 
   protected:
     __host__ void _copy(Image<T>& dst, cudaMemcpyKind memcpy_kind) const;
-    // FIXME const
 
   protected:
     int32_t width_;

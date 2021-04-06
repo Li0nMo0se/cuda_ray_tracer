@@ -37,8 +37,6 @@ __device__ bool Engine::check_shadow(const scene::Scene& scene,
     const space::Vector3 vector_to_light = light.origin_get() - intersection;
     const space::Ray ray(intersection, vector_to_light.normalized());
 
-    // FIXME: Here, we might not want to compute t but only know whether there's
-    // a intersection
     const cuda_tools::Optional<space::IntersectionInfo> intersection_info =
         cast_ray(ray, scene);
 
@@ -120,7 +118,7 @@ __device__ color::Color3 Engine::cast_ray_color(const space::Ray& ray,
             intersected_obj.normal_get(ray, intersection_v));
         return get_object_color(scene, ray, intersection_v);
     }
-    return color::black();
+    return color::background();
 }
 
 __device__ color::Color3
