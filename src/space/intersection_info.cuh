@@ -28,13 +28,22 @@ class IntersectionInfo
     {
     }
 
+    __host__ __device__ IntersectionInfo&
+    operator=(const space::IntersectionInfo& other)
+    {
+        t_ = other.t_;
+        obj_ = other.obj_;
+        intersection_ = other.intersection_;
+        return *this;
+    }
+
     __host__ __device__ void compute_intersection(const Ray& ray)
     {
         assert(t_.has_value());
         intersection_ = ray.origin_get() + t_.value() * ray.direction_get();
     }
 
-    // TODO instead of going to the normal, go back until no intersection with
+    // FIXME: instead of going to the normal, go back until no intersection with
     // yourself
     __host__ __device__ void auto_intersection_correction(const Vector3& normal)
     {
