@@ -112,16 +112,15 @@ __device__ inline const T& Vector<T>::operator[](const int32_t pos) const
     return *(data_[pos]);
 }
 
-// FIXME: return const T** ?
 template <typename T>
-T** Vector<T>::back_get() const
+const T** Vector<T>::back_get() const
 {
     cuda_safe_call(cudaDeviceSynchronize());
     if (size_ == 0)
         return nullptr;
     T** res = new T*;
     cudaMemcpy(res, data_ + size_ - 1, sizeof(T*), cudaMemcpyDeviceToHost);
-    return res;
+    return const_cast<const T**>(res);
 }
 
 } // namespace cuda_tools

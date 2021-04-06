@@ -72,7 +72,7 @@ static void parse_texture(const std::string& line,
         name_to_texture.end()) // Not found
     {
         textures.emplace_back<color::UniformTexture>(color, kd, ks, ns);
-        color::TextureMaterial** texture = textures.back_get();
+        const color::TextureMaterial** texture = textures.back_get();
         name_to_texture.insert({texture_name, *texture});
         delete texture;
     }

@@ -44,7 +44,7 @@ class Vector
     __device__ inline const T& operator[](const int32_t pos) const;
 
     // Get back of the vector
-    T** back_get() const;
+    const T** back_get() const;
 
   private:
     // Array
