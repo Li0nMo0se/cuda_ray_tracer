@@ -184,6 +184,23 @@ Vector<size, T>::operator[](const unsigned int pos) const
 }
 
 template <unsigned int size, typename T>
+inline bool Vector<size, T>::operator==(const Vector<size, T>& rhs) const
+{
+    for (unsigned int i = 0; i < size; i++)
+    {
+        if (this->vect_[i] != rhs.vect_[i])
+            return false;
+    }
+    return true;
+}
+
+template <unsigned int size, typename T>
+inline bool Vector<size, T>::operator!=(const Vector<size, T>& rhs) const
+{
+    return !(*this == rhs);
+}
+
+template <unsigned int size, typename T>
 inline constexpr T& Vector<size, T>::operator[](const unsigned int pos)
 {
     assert(pos < size && "index out of bound");

@@ -63,6 +63,9 @@ class Vector final
 
     __host__ __device__ inline constexpr T& operator[](const unsigned int pos);
 
+    __host__ __device__ inline bool operator==(const Vector& rhs) const;
+    __host__ __device__ inline bool operator!=(const Vector& rhs) const;
+
     virtual ~Vector() = default;
 
     friend Vector<3, float> cross_product(const Vector<3, float>& lhs,
