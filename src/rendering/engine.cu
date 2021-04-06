@@ -225,7 +225,7 @@ void Engine::render(const std::string& filename,
                                    frame_info,
                                    aliasing_level,
                                    reflection_max_depth);
-    cudaDeviceSynchronize();
+    cuda_safe_call(cudaDeviceSynchronize());
     check_error();
 
     // scene not usable because it has been copied

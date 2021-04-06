@@ -29,7 +29,7 @@ set(SRC_TESTS
 
 set(CXX_OPT_FLAGS "-Ofast -march=native -flto")
 # FIXME
-set(CUDA_OPT_FLAGS "-O2")
+set(CUDA_OPT_FLAGS "")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
