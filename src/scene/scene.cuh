@@ -6,6 +6,11 @@
 #include "scene/light.cuh"
 #include "scene/object.cuh"
 
+namespace rendering
+{
+class Engine;
+}
+
 namespace scene
 {
 class Scene final
@@ -30,6 +35,8 @@ class Scene final
     {
         return camera_;
     }
+
+    friend rendering::Engine; // The engine owns the scene
 
   private:
     // The unique camera of the scene
