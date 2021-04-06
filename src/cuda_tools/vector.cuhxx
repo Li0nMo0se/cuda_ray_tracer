@@ -100,9 +100,16 @@ void Vector<T>::emplace_back(Ts&&... args)
 }
 
 template <typename T>
-inline int32_t Vector<T>::size_get() const
+__device__ inline int32_t Vector<T>::size_get() const
 {
     return size_;
+}
+
+template <typename T>
+__device__ inline const T& Vector<T>::operator[](const int32_t pos) const
+{
+    assert(pos < size_);
+    return *(data_[pos]);
 }
 
 // FIXME: return const T** ?
