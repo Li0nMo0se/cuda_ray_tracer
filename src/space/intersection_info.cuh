@@ -78,7 +78,6 @@ class IntersectionInfo
 
     // FIXME: Instead of using the ratio, move until no intersection with
     // yourself
-    // FIXME: static constexpr works with gpu memory?
-    const float intersection_correction_ratio = 0.2f;
+    static constexpr float intersection_correction_ratio = 0.2f;
 };
 } // namespace space
