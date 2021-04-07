@@ -133,7 +133,7 @@ inline T Vector<size, T>::length() const
     T res = 0.0f;
     for (unsigned int i = 0; i < size; i++)
         res += vect_[i] * vect_[i];
-    return std::sqrt(res);
+    return sqrt(res);
 }
 
 template <unsigned int size, typename T>
