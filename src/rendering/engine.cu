@@ -51,74 +51,88 @@ __device__ bool Engine::check_shadow(const scene::Scene& scene,
     return intersection_info.value().t_get() < distance_to_light;
 }
 
-__device__ color::Color3
-Engine::get_object_color(const scene::Scene& scene,
-                         const space::Ray& ray,
-                         const space::IntersectionInfo& intersection_info)
-{
-    const scene::Object& obj = intersection_info.obj_get();
-    const color::TextureMaterial& texture = obj.get_texture();
-    const space::Vector3& intersection = intersection_info.intersection_get();
-
-    const float kd = texture.get_kd(intersection);
-    const float ks = texture.get_ks(intersection);
-    const float ns = texture.get_ns(intersection);
-    const color::Color3 obj_color = texture.get_color(intersection);
-
-    // Normal of the object at the intersection point
-    const space::Vector3& normal = obj.normal_get(ray, intersection_info);
-
-    // Compute the reflected vector
-    const space::Vector3 S =
-        intersection - normal * 2 * intersection.dot(normal);
-
-    color::Color3 color = color::black();
-
-    for (int32_t i = 0; i < scene.lights_.size_get(); i++)
-    {
-        const scene::Light& light = scene.lights_[i];
-
-        // Compute shadow (+ normal to avoid intersecting with yourself)
-        if (check_shadow(scene, light, intersection))
-            continue;
-
-        const space::Vector3 L = light.origin_get() - intersection;
-        const float intensity = light.intensity_get();
-        // Compute the diffuse light
-        const float coeff_diffuse =
-            kd * normal.dot(L) * intensity * distance_attenuation(L.length());
-        color += obj_color * coeff_diffuse;
-
-        // Compute the specular light
-        const float coeff_specular = ks * intensity * powf(S.dot(L), ns);
-        if (coeff_specular > 0)
-            color += coeff_specular;
-    }
-
-    return color;
-}
-
 __device__ inline float Engine::distance_attenuation(const float distance)
 {
     return 1.f / distance;
 }
 
-__device__ color::Color3 Engine::cast_ray_color(const space::Ray& ray,
-                                                const scene::Scene& scene)
+__device__ color::Color3
+Engine::cast_ray_color(space::Ray ray,
+                       const scene::Scene& scene,
+                       const int32_t reflection_max_depth)
 {
-    cuda_tools::Optional<space::IntersectionInfo> intersection =
-        cast_ray(ray, scene);
+    color::Color3 res_color = color::black();
 
-    if (intersection.has_value())
+    for (int32_t curr_reflection_level = 0;
+         curr_reflection_level < reflection_max_depth;
+         curr_reflection_level++)
     {
-        space::IntersectionInfo& intersection_v = intersection.value();
-        const scene::Object& intersected_obj = intersection_v.obj_get();
+        cuda_tools::Optional<space::IntersectionInfo> opt_intersection =
+            cast_ray(ray, scene);
+
+        if (!opt_intersection.has_value())
+            break;
+
+        space::IntersectionInfo& intersection_info = opt_intersection.value();
+        const scene::Object& obj = intersection_info.obj_get();
         // FIXME find more elegant way to do this
-        intersection_v.auto_intersection_correction(
-            intersected_obj.normal_get(ray, intersection_v));
-        return get_object_color(scene, ray, intersection_v);
+        intersection_info.auto_intersection_correction(
+            obj.normal_get(ray, intersection_info));
+
+        const color::TextureMaterial& texture = obj.get_texture();
+        const space::Point3& intersection =
+            intersection_info.intersection_get();
+
+        const float kd = texture.get_kd(intersection);
+        const float ks = texture.get_ks(intersection);
+        const float ns = texture.get_ns(intersection);
+
+        const color::Color3 obj_color = texture.get_color(intersection);
+
+        // Normal of the object at the intersection point
+        const space::Vector3& normal = obj.normal_get(ray, intersection_info);
+
+        // Compute the reflected vector
+        const space::Vector3 S =
+            intersection - normal * 2 * intersection.dot(normal);
+
+        color::Color3 curr_color = color::black();
+
+        // Foreach light, accumulate the color
+        for (int32_t i = 0; i < scene.lights_.size_get(); i++)
+        {
+            const scene::Light& light = scene.lights_[i];
+
+            // Compute shadow (+ normal to avoid intersecting with yourself)
+            if (check_shadow(scene, light, intersection))
+                continue;
+
+            const space::Vector3 L = light.origin_get() - intersection;
+            const float intensity = light.intensity_get();
+            // Compute the diffuse light
+            const float coeff_diffuse = kd * normal.dot(L) * intensity *
+                                        distance_attenuation(L.length());
+            curr_color += obj_color * coeff_diffuse;
+
+            // Compute the specular light
+            const float coeff_specular = ks * intensity * powf(S.dot(L), ns);
+            if (coeff_specular > 0)
+                curr_color += coeff_specular;
+        }
+
+        // Update result color (accumulate the color)
+        res_color += curr_color;
+
+        // No reflection to perform
+        if (ks == 0)
+            break;
+
+        // Create the new ray for the cast ray. Start from the intersection and
+        // its direction is the reflected vector (S here)
+        ray = space::Ray(intersection, S.normalized());
     }
-    return color::background();
+
+    return res_color;
 }
 
 __device__ color::Color3
@@ -137,7 +151,7 @@ Engine::get_pixel_color(const space::Point3& curr_pixel,
         (curr_pixel - camera.origin_).normalized();
     const space::Ray ray(camera.origin_, ray_direction);
 
-    return cast_ray_color(ray, scene);
+    return cast_ray_color(ray, scene, reflection_max_depth);
 }
 
 struct FrameInfo

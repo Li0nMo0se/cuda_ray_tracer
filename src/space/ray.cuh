@@ -25,7 +25,7 @@ class Ray
     };
 
   private:
-    const Point3 origin_;
-    const Vector3 direction_;
+    Point3 origin_;
+    Vector3 direction_;
 };
 } // namespace space

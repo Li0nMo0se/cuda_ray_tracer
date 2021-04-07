@@ -27,6 +27,7 @@ class Engine final
 
     // FIXME: The kernel needs it to be public to call it. But this method
     // should be private
+
     static __device__ color::Color3
     get_pixel_color(const space::Point3& curr_pixel,
                     const scene::Scene& scene,
@@ -43,14 +44,11 @@ class Engine final
                                         const scene::Light& light,
                                         const space::Point3& intersection);
 
-    static __device__ color::Color3
-    get_object_color(const scene::Scene& scene,
-                     const space::Ray& ray,
-                     const space::IntersectionInfo& intersection_info);
-
     static __device__ inline float distance_attenuation(const float distance);
 
-    static __device__ color::Color3 cast_ray_color(const space::Ray& ray,
-                                                   const scene::Scene& scene);
+    static __device__ color::Color3
+    cast_ray_color(space::Ray ray,
+                   const scene::Scene& scene,
+                   const int32_t reflection_max_depth);
 };
 } // namespace rendering
