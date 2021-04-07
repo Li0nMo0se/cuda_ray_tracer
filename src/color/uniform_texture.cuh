@@ -41,7 +41,7 @@ class UniformTexture final : public TextureMaterial
 
     __host__ __device__ virtual bool is_reflectable() const override
     {
-        return ks_ != 0;
+        return ks_ > 0.f;
     }
 
   private:
