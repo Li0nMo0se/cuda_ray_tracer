@@ -38,7 +38,7 @@ Plan::intersect(const space::Ray& ray) const
 
     const float denominator = ray.direction_get().dot(normal_);
     // Consider as no intersection
-    if (std::abs(denominator) < epsilone)
+    if (abs(denominator) < epsilone)
         return cuda_tools::nullopt;
 
     const float numerator = (origin_ - ray.origin_get()).dot(normal_);
