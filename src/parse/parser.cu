@@ -3,6 +3,7 @@
 #include "color/texture_material.cuh"
 #include "color/uniform_texture.cuh"
 #include "scene/camera.cuh"
+#include "scene/plan.cuh"
 #include "scene/point_light.cuh"
 #include "scene/sphere.cuh"
 #include "space/vector.cuh"
@@ -158,6 +159,28 @@ static void parse_sphere(const std::string& line,
     objects.emplace_back<scene::Sphere>(origin, radius, texture);
 }
 
+static void parse_plan(const std::string& line,
+                       scene::Scene::objects_t& objects,
+                       map_texture_t& name_to_texture,
+                       const int32_t nb_line)
+{
+    std::stringstream ss(line);
+    std::string tmp;
+    ss >> tmp; // Plan
+
+    std::string origin_str;
+    ss >> origin_str;
+    const space::Vector3 origin = parse_vector(origin_str);
+
+    std::string normal_str;
+    ss >> normal_str;
+    const space::Vector3 normal = parse_vector(normal_str);
+
+    const color::TextureMaterial* const texture =
+        get_texture(ss, name_to_texture, nb_line);
+    objects.emplace_back<scene::Plan>(origin, normal, texture);
+}
+
 scene::Scene parse_scene(const std::string& filename)
 {
     int32_t nb_line = 1;
@@ -191,6 +214,8 @@ scene::Scene parse_scene(const std::string& filename)
                 parse_texture(line, textures, name_to_texture, nb_line);
             else if (curr_token == "Sphere")
                 parse_sphere(line, objects, name_to_texture, nb_line);
+            else if (curr_token == "Plan")
+                parse_plan(line, objects, name_to_texture, nb_line);
             else if (curr_token == "PointLight")
                 parse_pointlight(line, lights);
             else
