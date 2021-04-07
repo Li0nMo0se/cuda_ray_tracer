@@ -39,6 +39,11 @@ class UniformTexture final : public TextureMaterial
         return ns_;
     }
 
+    __host__ __device__ virtual bool is_reflectable() const override
+    {
+        return ks_ != 0;
+    }
+
   private:
     color::Color3 colors_;
     float kd_;

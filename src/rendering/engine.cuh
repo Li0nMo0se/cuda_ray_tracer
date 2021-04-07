@@ -27,7 +27,6 @@ class Engine final
 
     // FIXME: The kernel needs it to be public to call it. But this method
     // should be private
-
     static __device__ color::Color3
     get_pixel_color(const space::Point3& curr_pixel,
                     const scene::Scene& scene,
@@ -40,15 +39,22 @@ class Engine final
     static __device__ cuda_tools::Optional<space::IntersectionInfo>
     cast_ray(const space::Ray& ray, const scene::Scene& scene);
 
+    static __device__ color::Color3
+    cast_ray_color(space::Ray ray,
+                   const scene::Scene& scene,
+                   const int32_t reflection_max_depth);
+
+    static __device__ color::Color3
+    compute_color(const scene::Scene& scene,
+                  const space::Point3& intersection,
+                  const space::Vector3& S,
+                  const space::Vector3& normal,
+                  const color::TextureMaterial& texture);
+
     static __device__ bool check_shadow(const scene::Scene& scene,
                                         const scene::Light& light,
                                         const space::Point3& intersection);
 
     static __device__ inline float distance_attenuation(const float distance);
-
-    static __device__ color::Color3
-    cast_ray_color(space::Ray ray,
-                   const scene::Scene& scene,
-                   const int32_t reflection_max_depth);
 };
 } // namespace rendering
