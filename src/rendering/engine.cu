@@ -58,21 +58,27 @@ __device__ inline float Engine::distance_attenuation(const float distance)
 
 __device__ color::Color3
 Engine::compute_color(const scene::Scene& scene,
-                      const space::Point3& intersection,
-                      const space::Vector3& normal,
-                      const space::Vector3& S,
-                      const color::TextureMaterial& texture)
+                      const space::Ray& ray,
+                      const space::IntersectionInfo& intersection_info,
+                      space::Vector3& S)
 {
-
-    color::Color3 color = color::black();
+    const scene::Object& obj = intersection_info.obj_get();
+    const color::TextureMaterial& texture = obj.get_texture();
+    const space::Vector3& intersection = intersection_info.intersection_get();
 
     const float kd = texture.get_kd(intersection);
     const float ks = texture.get_ks(intersection);
     const float ns = texture.get_ns(intersection);
-
     const color::Color3 obj_color = texture.get_color(intersection);
 
-    // Foreach light, accumulate the color
+    // Normal of the object at the intersection point
+    const space::Vector3& normal = obj.normal_get(ray, intersection_info);
+
+    // Compute the reflected vector
+    S = intersection - normal * 2 * intersection.dot(normal);
+
+    color::Color3 color = color::black();
+
     for (int32_t i = 0; i < scene.lights_.size_get(); i++)
     {
         const scene::Light& light = scene.lights_[i];
@@ -98,50 +104,67 @@ Engine::compute_color(const scene::Scene& scene,
 }
 
 __device__ color::Color3
-Engine::cast_ray_color(space::Ray ray,
+Engine::cast_ray_color(const space::Ray& ray,
                        const scene::Scene& scene,
                        const int32_t reflection_max_depth)
 {
-    color::Color3 res_color = color::black();
+    // FIXME: Almost twice the same code (before the loop and in the loop)
+    // See if it could be refactor
+    cuda_tools::Optional<space::IntersectionInfo> opt_intersection =
+        cast_ray(ray, scene);
 
-    for (int32_t curr_reflection_level = 0;
-         curr_reflection_level < reflection_max_depth;
-         curr_reflection_level++)
+    // Primary color
+    if (!opt_intersection.has_value())
+        return color::black();
+
+    space::IntersectionInfo& intersection_info = opt_intersection.value();
+    const scene::Object& intersected_obj = intersection_info.obj_get();
+    // FIXME find more elegant way to do this
+    intersection_info.auto_intersection_correction(
+        intersected_obj.normal_get(ray, intersection_info));
+
+    // FIXME: S not given as argument
+    // direction of the reflected ray
+    space::Vector3 S;
+    color::Color3 res_color = compute_color(scene, ray, intersection_info, S);
+
+    // Reflected color
+    for (int32_t i = 0; i < reflection_max_depth; i++)
     {
-        cuda_tools::Optional<space::IntersectionInfo> opt_intersection =
-            cast_ray(ray, scene);
+        // Store previous information
+        const float prev_ks = intersection_info.obj_get().get_texture().get_ks(
+            intersection_info.intersection_get());
+        if (prev_ks <= 0) // the last intersected object is not reflectable
+            break;
 
+        // Compute the reflected ray
+        space::Ray reflected_ray(intersection_info.intersection_get(),
+                                 S.normalized());
+
+        cuda_tools::Optional<space::IntersectionInfo> opt_intersection =
+            cast_ray(reflected_ray, scene);
+
+        // Primary color
         if (!opt_intersection.has_value())
             break;
 
         space::IntersectionInfo& intersection_info = opt_intersection.value();
-        const scene::Object& obj = intersection_info.obj_get();
+        const scene::Object& intersected_obj = intersection_info.obj_get();
         // FIXME find more elegant way to do this
         intersection_info.auto_intersection_correction(
-            obj.normal_get(ray, intersection_info));
+            intersected_obj.normal_get(reflected_ray, intersection_info));
 
-        const space::Point3& intersection =
-            intersection_info.intersection_get();
+        // FIXME: S not given as argument
+        // direction of the reflected ray
+        space::Vector3 S;
+        color::Color3 reflected_color =
+            compute_color(scene, reflected_ray, intersection_info, S);
 
-        // Normal of the object at the intersection point
-        const space::Vector3& normal = obj.normal_get(ray, intersection_info);
-
-        // Compute the reflected vector
-        const space::Vector3 S =
-            intersection - normal * 2 * intersection.dot(normal);
-
-        const color::TextureMaterial& obj_texture = obj.get_texture();
-
-        // Update result color (accumulate the color)
-        res_color += compute_color(scene, intersection, normal, S, obj_texture);
-
-        // No reflection to perform
-        if (!obj_texture.is_reflectable())
-            break;
-
-        // Create the new ray for the cast ray. Start from the intersection and
-        // its direction is the reflected vector (S here)
-        ray = space::Ray(intersection, S.normalized());
+        // Update the color by multiplying the reflected color with the
+        // specular coefficient
+        // FIXME: Attenuation
+        // res_color += reflected_color * prev_ks * (1 / (i + 1));
+        res_color += reflected_color * prev_ks;
     }
 
     return res_color;
@@ -250,6 +273,7 @@ void Engine::render(const std::string& filename,
                                    frame_info,
                                    aliasing_level,
                                    reflection_max_depth);
+
     cuda_safe_call(cudaDeviceSynchronize());
     check_error();
 

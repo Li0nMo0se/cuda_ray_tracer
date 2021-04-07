@@ -40,16 +40,15 @@ class Engine final
     cast_ray(const space::Ray& ray, const scene::Scene& scene);
 
     static __device__ color::Color3
-    cast_ray_color(space::Ray ray,
+    cast_ray_color(const space::Ray& ray,
                    const scene::Scene& scene,
                    const int32_t reflection_max_depth);
 
     static __device__ color::Color3
     compute_color(const scene::Scene& scene,
-                  const space::Point3& intersection,
-                  const space::Vector3& S,
-                  const space::Vector3& normal,
-                  const color::TextureMaterial& texture);
+                  const space::Ray& ray,
+                  const space::IntersectionInfo& intersection_info,
+                  space::Vector3& S);
 
     static __device__ bool check_shadow(const scene::Scene& scene,
                                         const scene::Light& light,
