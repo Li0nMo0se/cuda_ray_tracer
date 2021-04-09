@@ -5,6 +5,7 @@
 #include "scene/camera.cuh"
 #include "scene/plan.cuh"
 #include "scene/point_light.cuh"
+#include "scene/raybox.cuh"
 #include "scene/sphere.cuh"
 #include "space/vector.cuh"
 
@@ -181,6 +182,30 @@ static void parse_plan(const std::string& line,
     objects.emplace_back<scene::Plan>(origin, normal, texture);
 }
 
+static void parse_raybox(const std::string& line,
+                         scene::Scene::objects_t& objects,
+                         map_texture_t& name_to_texture,
+                         const int32_t nb_line)
+{
+
+    std::stringstream ss(line);
+    std::string tmp;
+    ss >> tmp; // Raybox
+
+    std::string lower_bound_str;
+    ss >> lower_bound_str;
+    const space::Vector3 lower_bound = parse_vector(lower_bound_str);
+
+    std::string higher_bound_str;
+    ss >> higher_bound_str;
+    const space::Vector3 higher_bound = parse_vector(higher_bound_str);
+
+    const color::TextureMaterial* const texture =
+        get_texture(ss, name_to_texture, nb_line);
+
+    objects.emplace_back<scene::RayBox>(lower_bound, higher_bound, texture);
+}
+
 scene::Scene parse_scene(const std::string& filename)
 {
     int32_t nb_line = 1;
@@ -216,6 +241,8 @@ scene::Scene parse_scene(const std::string& filename)
                 parse_sphere(line, objects, name_to_texture, nb_line);
             else if (curr_token == "Plan")
                 parse_plan(line, objects, name_to_texture, nb_line);
+            else if (curr_token == "Raybox")
+                parse_raybox(line, objects, name_to_texture, nb_line);
             else if (curr_token == "PointLight")
                 parse_pointlight(line, lights);
             else
