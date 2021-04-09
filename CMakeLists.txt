@@ -17,6 +17,7 @@ set(SRC
     src/rendering/engine.cu
     src/scene/camera.cu
     src/scene/plan.cu
+    src/scene/raybox.cu
     src/scene/sphere.cu
 )
 
