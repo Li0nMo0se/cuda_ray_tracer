@@ -173,19 +173,45 @@ Engine::cast_ray_color(const space::Ray& ray,
 __device__ color::Color3
 Engine::get_pixel_color(const space::Point3& curr_pixel,
                         const scene::Scene& scene,
-                        const int32_t unit_x,
-                        const int32_t unit_y,
+                        const float unit_x,
+                        const float unit_y,
                         const int32_t aliasing_level,
                         const int32_t reflection_max_depth)
 {
-    // FIXME: aliasing
-
     const scene::Camera& camera = scene.camera_get();
-    const space::Vector3 ray_direction =
-        (curr_pixel - camera.origin_).normalized();
-    const space::Ray ray(camera.origin_, ray_direction);
 
-    return cast_ray_color(ray, scene, reflection_max_depth);
+    // Aliasing, split the current pixel
+    const float aliasing_unit_x = unit_x / aliasing_level;
+    const float aliasing_unit_y = unit_y / aliasing_level;
+
+    // top left inner pixel
+    space::Vector3 top_left = curr_pixel - (unit_x / 2) * camera.x_axis_ +
+                              (unit_y / 2) * camera.y_axis_;
+    top_left = top_left + (aliasing_unit_x / 2) * camera.x_axis_ -
+               (aliasing_unit_y / 2) * camera.y_axis_;
+
+    // Variable to store the sum of the color of every inner pixel
+    color::Color3 total_color = color::black();
+
+    // Get color of every inner pixels
+    for (unsigned short y = 0; y < aliasing_level; y++)
+    {
+        for (unsigned short x = 0; x < aliasing_level; x++)
+        {
+            const space::Point3 curr_inner_pixel =
+                top_left + x * aliasing_unit_x * camera.x_axis_ -
+                y * aliasing_unit_y * camera.y_axis_;
+            const space::Vector3 ray_direction =
+                (curr_inner_pixel - camera.origin_).normalized();
+            const space::Ray ray(camera.origin_, ray_direction);
+            // Compute the color of the inner pixel and sum it up to the total
+            // color
+            total_color += cast_ray_color(ray, scene, reflection_max_depth);
+        }
+    }
+
+    // Return the mean color
+    return total_color / (aliasing_level * aliasing_level);
 }
 
 struct FrameInfo

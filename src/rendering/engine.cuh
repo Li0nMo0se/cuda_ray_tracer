@@ -30,8 +30,8 @@ class Engine final
     static __device__ color::Color3
     get_pixel_color(const space::Point3& curr_pixel,
                     const scene::Scene& scene,
-                    const int32_t unit_x,
-                    const int32_t unit_y,
+                    const float unit_x,
+                    const float unit_y,
                     const int32_t aliasing_level,
                     const int32_t reflection_max_depth);
 
