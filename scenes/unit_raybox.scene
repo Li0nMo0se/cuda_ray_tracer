@@ -1,0 +1,6 @@
+Camera (0,2,-1) (0,1,0) (0,0,1) 1 45 45
+UniformTexture red (255,0,0) 5 5 1
+PointLight (0,2,-1) 1
+
+# Unit Raybox
+Raybox (0,1,1) (1,2,2) red

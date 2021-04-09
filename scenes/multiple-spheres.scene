@@ -1,0 +1,33 @@
+# This is ignored
+# First declaration must be the camera
+# A vector or a point must be declared this way (x,y,z)
+# Such as Camera origin y_axis z_axis z_min alpha beta
+# alpha/beta in degrees
+Camera (0,1,0) (0,1,0) (0,0,1) 1 45 45
+
+# PointLight such as
+# PointLight origin intensity
+PointLight (0,4,0) 0.5
+
+UniformTexture red (255,0,0) 2 0 1
+Sphere (-3,1,5) 1 red
+UniformTexture white (255,255,255) 1 0.5 1
+Sphere (0,1,5) 1 white
+UniformTexture blue (0,0,255) 2 0 1
+Sphere (3,1,5) 1 blue
+UniformTexture yellow (255,255,0) 2 0 1
+Sphere (-1,2,9) 2 yellow
+UniformTexture green (0,255,0) 2 0.5 1
+Sphere (1,0.5,3) 0.5 green
+
+# Green for the plan texture
+UniformTexture plan_texture (100,100,100) 1 0 0
+# Plan such as
+# Plan origin normal texture_name
+Plan (0,0,0) (0,1,0) plan_texture
+
+UniformTexture plan_texture_2 (0,0,0) 1 0.2 0
+UniformTexture sky (135,206,235) 1 0 0
+Plan (0,0,20) (0,0,-1) sky
+Plan (5,0,0) (-1,0,0) plan_texture_2
+Plan (-5,0,0) (1,0,0) plan_texture_2
