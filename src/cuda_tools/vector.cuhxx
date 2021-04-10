@@ -1,4 +1,7 @@
 #include "vector.cuh"
+#include <cassert>
+#include <cstring>
+#include <cuda_runtime.h>
 
 namespace cuda_tools
 {
@@ -14,47 +17,55 @@ __global__ static void _kernel_dealloc(T** const data, const int32_t size)
 }
 
 template <typename T, typename SubT, typename... Ts>
-__global__ static void _kernel_add_object(T** const data, Ts... args)
+__global__ static void _kernel_emplace_object(T** const data, Ts... args)
 {
     // Data is already at the location in which the new element is stored
     *data = new SubT{args...};
 }
+
+template <typename T, typename SubT>
+__global__ static void _kernel_push_object(T** const data, const SubT& arg)
+{
+    // Data is already at the location in which the new element is stored
+    *data = new SubT(arg);
+}
+
 } // namespace
 
 template <typename T>
-Vector<T>::Vector()
+__device__ __host__ Vector<T>::Vector()
     : Vector(begin_capacity)
 {
 }
 
 template <typename T>
-Vector<T>::Vector(int32_t capacity)
+__device__ __host__ Vector<T>::Vector(int32_t capacity)
     : capacity_(capacity)
 {
     realloc(capacity);
 }
 
 template <typename T>
-Vector<T>::~Vector()
+__device__ __host__ Vector<T>::~Vector()
 {
     if (data_)
     {
-        cuda_safe_call(cudaDeviceSynchronize());
+        cudaDeviceSynchronize();
         _kernel_dealloc<<<1, 1>>>(data_, size_);
-        cuda_safe_call(cudaFree(data_));
+        cudaFree(data_);
     }
 }
 
 template <typename T>
-Vector<T>::Vector(Vector& other)
+__device__ __host__ Vector<T>::Vector(Vector& other)
     : Vector(std::move(other))
 {
 }
 
 template <typename T>
-Vector<T>::Vector(Vector&& other)
+__device__ __host__ Vector<T>::Vector(Vector&& other)
 {
-    cuda_safe_call(cudaDeviceSynchronize());
+    cudaDeviceSynchronize();
 
     // Copy fields
     size_ = other.size_;
@@ -68,19 +79,16 @@ Vector<T>::Vector(Vector&& other)
 }
 
 template <typename T>
-void Vector<T>::realloc(const int32_t new_capacity)
+__device__ __host__ void Vector<T>::realloc(const int32_t new_capacity)
 {
     if (!data_)
-        cuda_safe_call(cudaMalloc((void**)&data_, sizeof(T*) * new_capacity));
+        cudaMalloc((void**)&data_, sizeof(T*) * new_capacity);
     else
     {
         T** tmp;
-        cuda_safe_call(cudaMalloc((void**)&tmp, sizeof(T*) * new_capacity));
-        cuda_safe_call(cudaMemcpy(tmp,
-                                  data_,
-                                  sizeof(T*) * size_,
-                                  cudaMemcpyDeviceToDevice));
-        cuda_safe_call(cudaFree(data_));
+        cudaMalloc((void**)&tmp, sizeof(T*) * new_capacity);
+        std::memcpy(tmp, data_, sizeof(T*) * size_);
+        cudaFree(data_);
         data_ = tmp;
     }
     capacity_ = new_capacity;
@@ -90,7 +98,7 @@ template <typename T>
 template <typename SubT, typename... Ts>
 void Vector<T>::emplace_back(Ts&&... args)
 {
-    _kernel_add_object<T, SubT>
+    _kernel_emplace_object<T, SubT>
         <<<1, 1>>>(&(data_[size_]), std::forward<Ts>(args)...);
     ++size_;
 
@@ -100,13 +108,14 @@ void Vector<T>::emplace_back(Ts&&... args)
 }
 
 template <typename T>
-__device__ inline int32_t Vector<T>::size_get() const
+__device__ __host__ inline int32_t Vector<T>::size_get() const
 {
     return size_;
 }
 
 template <typename T>
-__device__ inline const T& Vector<T>::operator[](const int32_t pos) const
+__device__ __host__ inline const T&
+Vector<T>::operator[](const int32_t pos) const
 {
     assert(pos < size_);
     return *(data_[pos]);
@@ -119,7 +128,8 @@ const T** Vector<T>::back_get() const
     if (size_ == 0)
         return nullptr;
     T** res = new T*;
-    cudaMemcpy(res, data_ + size_ - 1, sizeof(T*), cudaMemcpyDeviceToHost);
+    cuda_safe_call(
+        cudaMemcpy(res, data_ + size_ - 1, sizeof(T*), cudaMemcpyDeviceToHost));
     return const_cast<const T**>(res);
 }
 

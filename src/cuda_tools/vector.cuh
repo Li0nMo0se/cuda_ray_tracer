@@ -11,24 +11,24 @@ class Vector
 {
   public:
     // Default with constructor with a minimum capacity
-    Vector();
+    __device__ __host__ Vector();
 
     // Constructor with a specified capacity
-    Vector(int32_t capacity);
+    __device__ __host__ Vector(int32_t capacity);
 
     // Deep destructor
-    ~Vector();
+    __device__ __host__ ~Vector();
 
     // Define copy as move constructor to avoid loose of ownership and multiple
     // delete (Can't duplicate vector)
-    Vector(Vector& other);
+    __device__ __host__ Vector(Vector& other);
     // Move copy constructor. Move the ownership.
-    Vector(Vector&& other);
+    __device__ __host__ Vector(Vector&& other);
 
     Vector& operator=(const Vector&) = delete;
 
     // Upgrade the capacity of the vector
-    void realloc(const int32_t new_capacity);
+    __device__ __host__ void realloc(const int32_t new_capacity);
 
     // Push back in the vector by constructing the object while pushing (no copy
     // is performed)
@@ -38,10 +38,10 @@ class Vector
     void emplace_back(Ts&&... args);
 
     // Get the current size of the vector
-    __device__ inline int32_t size_get() const;
+    __device__ __host__ inline int32_t size_get() const;
 
     // Get the nth-element
-    __device__ inline const T& operator[](const int32_t pos) const;
+    __device__ __host__ inline const T& operator[](const int32_t pos) const;
 
     // Get back of the vector
     const T** back_get() const;
