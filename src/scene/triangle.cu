@@ -2,11 +2,10 @@
 
 namespace scene
 {
-__host__ __device__
-Triangle::Triangle(const space::Point3& A,
-                   const space::Point3& B,
-                   const space::Point3& C,
-                   const color::TextureMaterial* const texture)
+__device__ Triangle::Triangle(const space::Point3& A,
+                              const space::Point3& B,
+                              const space::Point3& C,
+                              const color::TextureMaterial* const texture)
     : Object(texture)
     , A_(A)
     , B_(B)
@@ -16,14 +15,14 @@ Triangle::Triangle(const space::Point3& A,
 {
 }
 
-__host__ __device__ space::Vector3 Triangle::compute_normal() const
+__device__ space::Vector3 Triangle::compute_normal() const
 {
     const space::Vector3 AB = B_ - A_;
     const space::Vector3 AC = C_ - A_;
     return cross_product(AB, AC).normalized();
 }
 
-static __host__ __device__ inline float det_matrix(const float matrix[3][3])
+static __device__ inline float det_matrix(const float matrix[3][3])
 {
     return matrix[0][0] *
                (matrix[1][1] * matrix[2][2] - matrix[2][1] * matrix[1][2]) -
@@ -37,7 +36,7 @@ static __host__ __device__ inline float det_matrix(const float matrix[3][3])
 // Return a Vector3 as the solution of the equation is a matrix shape=(3,1)
 // The equation might have infinite or zero solutions, thus return a
 // cuda_tools::Optional
-static __host__ __device__ cuda_tools::Optional<space::Vector3>
+static __device__ cuda_tools::Optional<space::Vector3>
 find_solution(const float coeff[3][4])
 {
     // Build the 3 Cramer's matrices
@@ -74,7 +73,7 @@ find_solution(const float coeff[3][4])
         return cuda_tools::nullopt;
 }
 
-cuda_tools::Optional<space::IntersectionInfo>
+__device__ cuda_tools::Optional<space::IntersectionInfo>
 Triangle::intersect(const space::Ray& ray) const
 {
     // Solve linera equation using Cramer's rule to find intersection
@@ -123,7 +122,7 @@ Triangle::intersect(const space::Ray& ray) const
     return space::IntersectionInfo(t, *this);
 }
 
-__host__ __device__ space::Vector3
+__device__ space::Vector3
 Triangle::normal_get(const space::Ray& ray,
                      const space::IntersectionInfo&) const
 {

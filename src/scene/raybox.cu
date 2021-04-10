@@ -3,9 +3,9 @@
 namespace scene
 {
 
-__host__ __device__ RayBox::RayBox(const space::Point3& lower_bound,
-                                   const space::Point3& higher_bound,
-                                   const color::TextureMaterial* const texture)
+__device__ RayBox::RayBox(const space::Point3& lower_bound,
+                          const space::Point3& higher_bound,
+                          const color::TextureMaterial* const texture)
     : Object(texture)
     , lower_bound_(lower_bound)
     , higher_bound_(higher_bound)
@@ -20,14 +20,14 @@ __host__ __device__ RayBox::RayBox(const space::Point3& lower_bound,
 }
 
 template <typename T>
-static __host__ __device__ void swap(T& a, T& b)
+static __device__ void swap(T& a, T& b)
 {
     T c(a);
     a = b;
     b = c;
 }
 
-__host__ __device__ cuda_tools::Optional<space::IntersectionInfo>
+__device__ cuda_tools::Optional<space::IntersectionInfo>
 RayBox::intersect(const space::Ray& ray) const
 {
     // The algorithm comes from scratchpixel
@@ -93,7 +93,7 @@ RayBox::intersect(const space::Ray& ray) const
     return space::IntersectionInfo(t_res, *this);
 }
 
-__host__ __device__ space::Vector3
+__device__ space::Vector3
 RayBox::normal_get(const space::Ray&,
                    const space::IntersectionInfo& intersection) const
 {

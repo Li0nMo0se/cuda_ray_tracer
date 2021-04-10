@@ -3,16 +3,16 @@
 
 namespace scene
 {
-Sphere::Sphere(const space::Point3& origin,
-               const float radius,
-               const color::TextureMaterial* const texture)
+__device__ Sphere::Sphere(const space::Point3& origin,
+                          const float radius,
+                          const color::TextureMaterial* const texture)
     : Object(texture)
     , origin_(origin)
     , radius_(radius)
 {
 }
 
-static __host__ __device__ cuda_tools::Optional<float>
+static __device__ cuda_tools::Optional<float>
 solve_quadratic(const float a, const float b, const float c)
 {
     float delta = b * b - 4 * a * c;
@@ -35,7 +35,7 @@ solve_quadratic(const float a, const float b, const float c)
         return t0 < t1 ? t0 : t1;
 }
 
-cuda_tools::Optional<space::IntersectionInfo>
+__device__ cuda_tools::Optional<space::IntersectionInfo>
 Sphere::intersect(const space::Ray& ray) const
 {
     // P = O + tD
@@ -72,7 +72,7 @@ Sphere::intersect(const space::Ray& ray) const
     return space::IntersectionInfo(t_res.value(), *this);
 }
 
-space::Vector3
+__device__ space::Vector3
 Sphere::normal_get(const space::Ray&,
                    const space::IntersectionInfo& intersection) const
 {

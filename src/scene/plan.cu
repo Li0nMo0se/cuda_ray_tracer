@@ -2,9 +2,9 @@
 
 namespace scene
 {
-__host__ __device__ Plan::Plan(const space::Point3& origin,
-                               const space::Vector3& normal,
-                               const color::TextureMaterial* const texture)
+__device__ Plan::Plan(const space::Point3& origin,
+                      const space::Vector3& normal,
+                      const color::TextureMaterial* const texture)
     : Object(texture)
     , origin_(origin)
     , normal_(normal.normalized())
@@ -12,8 +12,8 @@ __host__ __device__ Plan::Plan(const space::Point3& origin,
 {
 }
 
-__host__ __device__ space::Vector3
-Plan::normal_get(const space::Ray& ray, const space::IntersectionInfo&) const
+__device__ space::Vector3 Plan::normal_get(const space::Ray& ray,
+                                           const space::IntersectionInfo&) const
 {
     // if dot product is positive, the angle is lower than pi/2.
     // The normal must have an angle greater than pi/2
@@ -25,7 +25,7 @@ Plan::normal_get(const space::Ray& ray, const space::IntersectionInfo&) const
     return normal_;
 }
 
-__host__ __device__ cuda_tools::Optional<space::IntersectionInfo>
+__device__ cuda_tools::Optional<space::IntersectionInfo>
 Plan::intersect(const space::Ray& ray) const
 {
     // Let's P be the intersection point such as P = O + tD

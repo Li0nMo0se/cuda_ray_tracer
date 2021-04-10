@@ -8,20 +8,20 @@ namespace scene
 class Triangle final : public Object
 {
   public:
-    __host__ __device__ Triangle(const space::Point3& A,
-                                 const space::Point3& B,
-                                 const space::Point3& C,
-                                 const color::TextureMaterial* const texture);
+    __device__ Triangle(const space::Point3& A,
+                        const space::Point3& B,
+                        const space::Point3& C,
+                        const color::TextureMaterial* const texture);
 
-    __host__ __device__ virtual cuda_tools::Optional<space::IntersectionInfo>
+    __device__ virtual cuda_tools::Optional<space::IntersectionInfo>
     intersect(const space::Ray& ray) const override;
 
-    __host__ __device__ virtual space::Vector3
+    __device__ virtual space::Vector3
     normal_get(const space::Ray& ray,
                const space::IntersectionInfo&) const override;
 
   private:
-    __host__ __device__ space::Vector3 compute_normal() const;
+    __device__ space::Vector3 compute_normal() const;
 
   private:
     const space::Point3 A_;
