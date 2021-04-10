@@ -19,7 +19,7 @@ class Vector final
                       "Vector constructor: wrong number of arguments");
     }
 
-    __host__ __device__ Vector() {}
+    Vector() = default;
 
     __host__ __device__ Vector& operator=(const Vector& vector);
     __host__ __device__ Vector(const Vector& vector);
