@@ -1,0 +1,5 @@
+Camera (0,1,0) (0,1,0) (0,0,1) 1 45 45
+PointLight (0,1,0) 1
+
+UniformTexture texture (0,255,255) 1 1 1
+Triangle (0,0,1) (1,1,1) (-1,1,1) texture

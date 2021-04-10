@@ -7,6 +7,7 @@
 #include "scene/point_light.cuh"
 #include "scene/raybox.cuh"
 #include "scene/sphere.cuh"
+#include "scene/triangle.cuh"
 #include "space/vector.cuh"
 
 #include <cmath>
@@ -206,6 +207,33 @@ static void parse_raybox(const std::string& line,
     objects.emplace_back<scene::RayBox>(lower_bound, higher_bound, texture);
 }
 
+static void parse_triangle(const std::string& line,
+                           scene::Scene::objects_t& objects,
+                           map_texture_t& name_to_texture,
+                           const int32_t nb_line)
+{
+    std::stringstream ss(line);
+    std::string tmp;
+    ss >> tmp; // Triangle
+
+    std::string A_str;
+    ss >> A_str;
+    const space::Vector3 A = parse_vector(A_str);
+
+    std::string B_str;
+    ss >> B_str;
+    const space::Vector3 B = parse_vector(B_str);
+
+    std::string C_str;
+    ss >> C_str;
+    const space::Vector3 C = parse_vector(C_str);
+
+    const color::TextureMaterial* const texture =
+        get_texture(ss, name_to_texture, nb_line);
+
+    return objects.emplace_back<scene::Triangle>(A, B, C, texture);
+}
+
 scene::Scene parse_scene(const std::string& filename)
 {
     int32_t nb_line = 1;
@@ -243,6 +271,8 @@ scene::Scene parse_scene(const std::string& filename)
                 parse_plan(line, objects, name_to_texture, nb_line);
             else if (curr_token == "Raybox")
                 parse_raybox(line, objects, name_to_texture, nb_line);
+            else if (curr_token == "Triangle")
+                parse_triangle(line, objects, name_to_texture, nb_line);
             else if (curr_token == "PointLight")
                 parse_pointlight(line, lights);
             else
