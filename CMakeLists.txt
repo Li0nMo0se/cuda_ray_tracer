@@ -19,6 +19,7 @@ set(SRC
     src/scene/plan.cu
     src/scene/raybox.cu
     src/scene/sphere.cu
+    src/scene/triangle.cu
 )
 
 set(SRC_TESTS
