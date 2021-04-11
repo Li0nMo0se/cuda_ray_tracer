@@ -25,7 +25,9 @@ TEST(RenderingImage, CreateImageHandler)
 {
     constexpr uint32_t width = 5;
     constexpr uint32_t height = 10;
-    rendering::ImageHandler<color::Color3> img_handler(width, height);
+    cudaStream_t stream;
+    cudaStreamCreate(&stream);
+    rendering::ImageHandler<color::Color3> img_handler(width, height, stream);
     ASSERT_TRUE(true);
 }
 
@@ -48,7 +50,9 @@ TEST(RenderingImage, DeviceImageCopyHost)
 {
     constexpr uint32_t width = 5;
     constexpr uint32_t height = 10;
-    rendering::ImageHandler<color::Color3> img_handler(width, height);
+    cudaStream_t stream;
+    cudaStreamCreate(&stream);
+    rendering::ImageHandler<color::Color3> img_handler(width, height, stream);
     kernel_set<<<1, 1>>>(img_handler.device);
     cuda_safe_call(cudaDeviceSynchronize());
     check_error();

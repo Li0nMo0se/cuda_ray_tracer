@@ -15,15 +15,17 @@ void VideoEngine::render_frame(const std::string& input_filename,
                                const uint32_t width,
                                const uint32_t height,
                                const uint32_t aliasing_level,
-                               const uint32_t reflection_max_depth)
+                               const uint32_t reflection_max_depth,
+                               const cudaStream_t stream)
 {
-    scene::Scene scene = parse::parse_scene(input_filename);
+    scene::Scene scene = parse::parse_scene(input_filename, stream);
     Engine::render(output_filename,
                    width,
                    height,
                    scene,
                    aliasing_level,
-                   reflection_max_depth);
+                   reflection_max_depth,
+                   stream);
 }
 
 void VideoEngine::render(const std::string& input_path,

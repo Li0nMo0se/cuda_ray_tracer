@@ -234,7 +234,7 @@ static void parse_triangle(const std::string& line,
     return objects.emplace_back<scene::Triangle>(A, B, C, texture);
 }
 
-scene::Scene parse_scene(const std::string& filename)
+scene::Scene parse_scene(const std::string& filename, const cudaStream_t stream)
 {
     int32_t nb_line = 1;
     std::ifstream in(filename);
@@ -247,9 +247,9 @@ scene::Scene parse_scene(const std::string& filename)
     // File is valid
     std::optional<scene::Camera> camera;
 
-    scene::Scene::objects_t objects;
-    scene::Scene::lights_t lights;
-    scene::Scene::textures_t textures;
+    scene::Scene::objects_t objects(stream);
+    scene::Scene::lights_t lights(stream);
+    scene::Scene::textures_t textures(stream);
 
     map_texture_t name_to_texture;
 

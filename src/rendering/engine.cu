@@ -255,10 +255,11 @@ void Engine::render(const std::string& filename,
                     const int32_t resolution_height,
                     scene::Scene& scene,
                     const int32_t aliasing_level,
-                    const int32_t reflection_max_depth)
+                    const int32_t reflection_max_depth,
+                    const cudaStream_t stream)
 {
     // Create Image
-    ImageHandler<color::Color3> im(resolution_width, resolution_height);
+    ImageHandler<color::Color3> im(resolution_width, resolution_height, stream);
 
     // Find width & height of a pixel
     const scene::Camera& camera = scene.camera_get();
@@ -294,13 +295,13 @@ void Engine::render(const std::string& filename,
                     1 + (resolution_height - 1) / block.y);
 
     const FrameInfo frame_info{top_left, unit_x, unit_y};
-    kernel_render<<<grid, block>>>(im.device,
-                                   scene,
-                                   frame_info,
-                                   aliasing_level,
-                                   reflection_max_depth);
+    kernel_render<<<grid, block, 0, stream>>>(im.device,
+                                              scene,
+                                              frame_info,
+                                              aliasing_level,
+                                              reflection_max_depth);
 
-    cuda_safe_call(cudaDeviceSynchronize());
+    cuda_safe_call(cudaStreamSynchronize(stream));
     check_error();
 
     // scene not usable because it has been copied

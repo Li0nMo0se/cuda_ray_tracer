@@ -22,14 +22,15 @@ __global__ static void _kernel_add_object(T** const data, Ts... args)
 } // namespace
 
 template <typename T>
-Vector<T>::Vector()
-    : Vector(begin_capacity)
+Vector<T>::Vector(const cudaStream_t stream)
+    : Vector(begin_capacity, stream)
 {
 }
 
 template <typename T>
-Vector<T>::Vector(int32_t capacity)
+Vector<T>::Vector(int32_t capacity, const cudaStream_t stream)
     : capacity_(capacity)
+    , stream_(stream)
 {
     realloc(capacity);
 }
@@ -39,8 +40,10 @@ Vector<T>::~Vector()
 {
     if (data_)
     {
-        cuda_safe_call(cudaDeviceSynchronize());
-        _kernel_dealloc<<<1, 1>>>(data_, size_);
+        // Implicit synchronization with the stream_
+        _kernel_dealloc<<<1, 1, 0, stream_>>>(data_, size_);
+        cuda_safe_call(cudaStreamSynchronize(stream_));
+        check_error();
         cuda_safe_call(cudaFree(data_));
     }
 }
@@ -54,12 +57,13 @@ Vector<T>::Vector(Vector& other)
 template <typename T>
 Vector<T>::Vector(Vector&& other)
 {
-    cuda_safe_call(cudaDeviceSynchronize());
+    cuda_safe_call(cudaStreamSynchronize(other.stream_));
 
     // Copy fields
     size_ = other.size_;
     capacity_ = other.capacity_;
     data_ = other.data_;
+    stream_ = other.stream_;
 
     // Empty other
     other.size_ = 0;
@@ -76,10 +80,12 @@ void Vector<T>::realloc(const int32_t new_capacity)
     {
         T** tmp;
         cuda_safe_call(cudaMalloc((void**)&tmp, sizeof(T*) * new_capacity));
-        cuda_safe_call(cudaMemcpy(tmp,
-                                  data_,
-                                  sizeof(T*) * size_,
-                                  cudaMemcpyDeviceToDevice));
+        cuda_safe_call(cudaMemcpyAsync(tmp,
+                                       data_,
+                                       sizeof(T*) * size_,
+                                       cudaMemcpyDeviceToDevice,
+                                       stream_));
+        cuda_safe_call(cudaStreamSynchronize(stream_));
         cuda_safe_call(cudaFree(data_));
         data_ = tmp;
     }
@@ -91,7 +97,7 @@ template <typename SubT, typename... Ts>
 void Vector<T>::emplace_back(Ts&&... args)
 {
     _kernel_add_object<T, SubT>
-        <<<1, 1>>>(&(data_[size_]), std::forward<Ts>(args)...);
+        <<<1, 1, 0, stream_>>>(&(data_[size_]), std::forward<Ts>(args)...);
     ++size_;
 
     // Upgrade the capacity
@@ -115,11 +121,20 @@ __device__ inline const T& Vector<T>::operator[](const int32_t pos) const
 template <typename T>
 const T** Vector<T>::back_get() const
 {
-    cuda_safe_call(cudaDeviceSynchronize());
+    // Wait for every kernels and copying to finish
+    cuda_safe_call(cudaStreamSynchronize(stream_));
+
     if (size_ == 0)
         return nullptr;
     T** res = new T*;
-    cudaMemcpy(res, data_ + size_ - 1, sizeof(T*), cudaMemcpyDeviceToHost);
+    cuda_safe_call(cudaMemcpyAsync(res,
+                                   data_ + size_ - 1,
+                                   sizeof(T*),
+                                   cudaMemcpyDeviceToHost,
+                                   stream_));
+
+    // Return when the copy is finished
+    cuda_safe_call(cudaStreamSynchronize(stream_));
     return const_cast<const T**>(res);
 }
 
