@@ -6,9 +6,12 @@
 namespace rendering
 {
 
-static __global__ void update_scene(scene::Scene::objects_t objects)
+static __global__ void update_scene(scene::Scene::objects_t objects,
+                                    const int32_t size)
 {
-    objects[threadIdx.x * blockIdx.x].translate();
+    const int32_t x = blockIdx.x * blockDim.x + threadIdx.x;
+    if (x < size)
+        objects[x].translate();
 }
 
 void VideoEngine::render(const std::string& input_path,
@@ -22,6 +25,7 @@ void VideoEngine::render(const std::string& input_path,
     const uint32_t max_digits = count_digits(nb_frames);
 
     scene::Scene scene = parse::parse_scene(input_path);
+    const int32_t nb_objects = scene.objects_.size_get();
 
     for (uint32_t index_frame = 0; index_frame < nb_frames; index_frame++)
     {
@@ -35,7 +39,12 @@ void VideoEngine::render(const std::string& input_path,
                        aliasing_level,
                        reflection_max_depth);
 
-        update_scene<<<1, 1>>>(scene.objects_);
+        // FIXME: Correct?
+        constexpr int32_t TILE_W = 64;
+        const dim3 block(TILE_W);
+        const dim3 grid(1 + (nb_objects - 1) / block.x);
+
+        update_scene<<<grid, block>>>(scene.objects_, nb_objects);
     }
 
     scene.free();

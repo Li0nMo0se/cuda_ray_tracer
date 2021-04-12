@@ -78,7 +78,7 @@ void Vector<T>::emplace_back(Ts&&... args)
 }
 
 template <typename T>
-__device__ inline int32_t Vector<T>::size_get() const
+__host__ __device__ inline int32_t Vector<T>::size_get() const
 {
     return size_;
 }

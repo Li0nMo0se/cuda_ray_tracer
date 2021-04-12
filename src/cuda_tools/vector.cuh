@@ -32,7 +32,7 @@ class Vector
     void emplace_back(Ts&&... args);
 
     // Get the current size of the vector
-    __device__ inline int32_t size_get() const;
+    __host__ __device__ inline int32_t size_get() const;
 
     // Get the nth-element
     __device__ inline const T& operator[](const int32_t pos) const;
