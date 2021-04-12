@@ -20,14 +20,16 @@ class Triangle final : public Object
     normal_get(const space::Ray& ray,
                const space::IntersectionInfo&) const override;
 
+    __device__ void translate() override;
+
   private:
     __device__ space::Vector3 compute_normal() const;
 
   private:
-    const space::Point3 A_;
-    const space::Point3 B_;
-    const space::Point3 C_;
-    const space::Vector3 normal_;
-    const space::Vector3 opposite_normal_;
+    space::Point3 A_;
+    space::Point3 B_;
+    space::Point3 C_;
+    space::Vector3 normal_;
+    space::Vector3 opposite_normal_;
 };
 } // namespace scene

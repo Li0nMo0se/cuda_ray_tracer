@@ -4,18 +4,36 @@
 #include "cuda_tools/optional.cuh"
 #include "space/intersection_info.cuh"
 #include "space/ray.cuh"
+#include "space/vector.cuh"
 
 namespace scene
 {
 
+class Translatable
+{
+  public:
+    __device__ Translatable(const space::Vector3& translation)
+        : translation_(translation)
+    {
+    }
+
+    __device__ virtual void translate() = 0;
+
+  protected:
+    space::Vector3 translation_;
+};
+
 // Near zero value
 constexpr float epsilone = 1e-6;
 
-class Object
+class Object : public Translatable
 {
   public:
-    __device__ Object(const color::TextureMaterial* const texture)
-        : texture_(texture)
+    __device__
+    Object(const color::TextureMaterial* const texture,
+           const space::Vector3& translation = space::Vector3(0.f, 0.f, 0.f))
+        : Translatable(translation)
+        , texture_(texture)
     {
     }
 

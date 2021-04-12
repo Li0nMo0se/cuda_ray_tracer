@@ -47,4 +47,6 @@ Plan::intersect(const space::Ray& ray) const
         return cuda_tools::nullopt;
     return space::IntersectionInfo(t_res, *this);
 }
+
+__device__ void Plan::translate() { origin_ += translation_; }
 } // namespace scene

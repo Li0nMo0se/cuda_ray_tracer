@@ -20,6 +20,8 @@ class RayBox final : public Object
     normal_get(const space::Ray&,
                const space::IntersectionInfo& intersection) const override;
 
+    __device__ void translate() override;
+
     __device__ inline const space::Point3& lower_bound_get() const
     {
         return lower_bound_;
@@ -30,9 +32,13 @@ class RayBox final : public Object
     }
 
   private:
-    const space::Point3 lower_bound_;
-    const space::Point3 higher_bound_;
-    const space::Point3 center_;
-    const space::Vector3 map_to_unit_box_;
+    __device__ space::Point3 compute_center() const;
+    __device__ space::Point3 compute_map_to_unit_box() const;
+
+  private:
+    space::Point3 lower_bound_;
+    space::Point3 higher_bound_;
+    space::Point3 center_;
+    space::Vector3 map_to_unit_box_;
 };
 } // namespace scene

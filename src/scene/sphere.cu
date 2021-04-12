@@ -12,6 +12,8 @@ __device__ Sphere::Sphere(const space::Point3& origin,
 {
 }
 
+__device__ void Sphere::translate() { origin_ += translation_; }
+
 static __device__ cuda_tools::Optional<float>
 solve_quadratic(const float a, const float b, const float c)
 {

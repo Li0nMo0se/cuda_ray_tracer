@@ -20,10 +20,12 @@ class Plan final : public Object
     normal_get(const space::Ray& ray,
                const space::IntersectionInfo&) const override;
 
+    __device__ void translate() override;
+
   private:
-    const space::Point3 origin_;
-    const space::Vector3 normal_;
+    space::Point3 origin_;
+    space::Vector3 normal_;
     // Store opposite normal to avoid computing every time
-    const space::Vector3 opposite_normal_;
+    space::Vector3 opposite_normal_;
 };
 } // namespace scene

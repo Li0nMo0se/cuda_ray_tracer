@@ -15,6 +15,15 @@ __device__ Triangle::Triangle(const space::Point3& A,
 {
 }
 
+__device__ void Triangle::translate()
+{
+    A_ += translation_;
+    B_ += translation_;
+    C_ += translation_;
+    normal_ = compute_normal();
+    opposite_normal_ = -normal_;
+}
+
 __device__ space::Vector3 Triangle::compute_normal() const
 {
     const space::Vector3 AB = B_ - A_;

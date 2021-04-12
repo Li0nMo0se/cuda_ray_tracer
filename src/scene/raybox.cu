@@ -9,14 +9,31 @@ __device__ RayBox::RayBox(const space::Point3& lower_bound,
     : Object(texture)
     , lower_bound_(lower_bound)
     , higher_bound_(higher_bound)
-    , center_((lower_bound_ + higher_bound_) / 2) // (lower + higher) / 2
-    , map_to_unit_box_((higher_bound_ - lower_bound_) /
-                       2) // (higher - lower) / 2
+    , center_(compute_center())
+    , map_to_unit_box_(compute_map_to_unit_box())
 
 {
     assert(lower_bound_[0] <= higher_bound_[0]);
     assert(lower_bound_[1] <= higher_bound_[1]);
     assert(lower_bound_[2] <= higher_bound_[2]);
+}
+
+__device__ space::Point3 RayBox::compute_center() const
+{
+    return (lower_bound_ + higher_bound_) / 2;
+}
+
+__device__ space::Point3 RayBox::compute_map_to_unit_box() const
+{
+    return (higher_bound_ - lower_bound_) / 2;
+}
+
+__device__ void RayBox::translate()
+{
+    lower_bound_ += translation_;
+    higher_bound_ += translation_;
+    center_ = compute_center();
+    map_to_unit_box_ = compute_map_to_unit_box();
 }
 
 template <typename T>

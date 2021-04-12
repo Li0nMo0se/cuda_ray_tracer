@@ -19,8 +19,10 @@ class Sphere final : public Object
     normal_get(const space::Ray&,
                const space::IntersectionInfo& intersection) const override;
 
+    __device__ void translate() override;
+
   private:
-    const space::Point3 origin_;
+    space::Point3 origin_;
     const float radius_;
 };
 } // namespace scene
