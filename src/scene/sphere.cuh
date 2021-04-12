@@ -10,7 +10,8 @@ class Sphere final : public Object
   public:
     __device__ Sphere(const space::Point3& origin,
                       const float radius,
-                      const color::TextureMaterial* const texture);
+                      const color::TextureMaterial* const texture,
+                      const space::Vector3& translation);
 
     __device__ virtual cuda_tools::Optional<space::IntersectionInfo>
     intersect(const space::Ray& ray) const override;

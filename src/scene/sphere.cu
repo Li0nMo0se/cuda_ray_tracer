@@ -5,8 +5,9 @@ namespace scene
 {
 __device__ Sphere::Sphere(const space::Point3& origin,
                           const float radius,
-                          const color::TextureMaterial* const texture)
-    : Object(texture)
+                          const color::TextureMaterial* const texture,
+                          const space::Vector3& translation)
+    : Object(texture, translation)
     , origin_(origin)
     , radius_(radius)
 {

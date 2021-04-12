@@ -9,9 +9,11 @@ namespace scene
 class RayBox final : public Object
 {
   public:
-    __device__ RayBox(const space::Point3& lower_bound,
-                      const space::Point3& higher_bound,
-                      const color::TextureMaterial* const texture = nullptr);
+    __device__
+    RayBox(const space::Point3& lower_bound,
+           const space::Point3& higher_bound,
+           const color::TextureMaterial* const texture = nullptr,
+           const space::Vector3& translation = space::Vector3(0.f, 0.f, 0.f));
 
     __device__ virtual cuda_tools::Optional<space::IntersectionInfo>
     intersect(const space::Ray& ray) const override;

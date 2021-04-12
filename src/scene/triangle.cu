@@ -5,8 +5,9 @@ namespace scene
 __device__ Triangle::Triangle(const space::Point3& A,
                               const space::Point3& B,
                               const space::Point3& C,
-                              const color::TextureMaterial* const texture)
-    : Object(texture)
+                              const color::TextureMaterial* const texture,
+                              const space::Vector3& translation)
+    : Object(texture, translation)
     , A_(A)
     , B_(B)
     , C_(C)

@@ -55,6 +55,18 @@ static space::Vector3 parse_vector(std::string str)
     return space::Vector3(x, y, z);
 }
 
+static space::Vector3 get_translation(std::stringstream& ss)
+{
+    std::string translation_str;
+    ss >> translation_str;
+
+    space::Vector3 translation = space::Vector3(0.f, 0.f, 0.f);
+    if (translation_str.size() > 0)
+        translation = parse_vector(translation_str);
+
+    return translation;
+}
+
 /*** Texture ***/
 /* Parse an Uniform Texture */
 static void parse_texture(const std::string& line,
@@ -99,6 +111,7 @@ get_texture(std::stringstream& ss,
         throw ParseError("No such texture " + texture_name, nb_line);
     return it->second;
 }
+
 /*** Camera ***/
 /* Parse a line which describe the camera */
 static scene::Camera parse_camera(const std::string& line)
@@ -162,7 +175,10 @@ static void parse_sphere(const std::string& line,
 
     const color::TextureMaterial* const texture =
         get_texture(ss, name_to_texture, nb_line);
-    objects.emplace_back<scene::Sphere>(origin, radius, texture);
+
+    const space::Vector3 translation = get_translation(ss);
+
+    objects.emplace_back<scene::Sphere>(origin, radius, texture, translation);
 }
 
 static void parse_plan(const std::string& line,
@@ -184,7 +200,10 @@ static void parse_plan(const std::string& line,
 
     const color::TextureMaterial* const texture =
         get_texture(ss, name_to_texture, nb_line);
-    objects.emplace_back<scene::Plan>(origin, normal, texture);
+
+    const space::Vector3 translation = get_translation(ss);
+
+    objects.emplace_back<scene::Plan>(origin, normal, texture, translation);
 }
 
 static void parse_raybox(const std::string& line,
@@ -208,7 +227,12 @@ static void parse_raybox(const std::string& line,
     const color::TextureMaterial* const texture =
         get_texture(ss, name_to_texture, nb_line);
 
-    objects.emplace_back<scene::RayBox>(lower_bound, higher_bound, texture);
+    const space::Vector3 translation = get_translation(ss);
+
+    objects.emplace_back<scene::RayBox>(lower_bound,
+                                        higher_bound,
+                                        texture,
+                                        translation);
 }
 
 static void parse_triangle(const std::string& line,
@@ -235,7 +259,9 @@ static void parse_triangle(const std::string& line,
     const color::TextureMaterial* const texture =
         get_texture(ss, name_to_texture, nb_line);
 
-    return objects.emplace_back<scene::Triangle>(A, B, C, texture);
+    const space::Vector3 translation = get_translation(ss);
+
+    return objects.emplace_back<scene::Triangle>(A, B, C, texture, translation);
 }
 
 scene::Scene parse_scene(const std::string& filename)

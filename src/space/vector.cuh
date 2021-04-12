@@ -80,7 +80,7 @@ operator*(const float scalar, const Vector<size, T>& vect)
 using Vector3 = Vector<3, float>;
 using Point3 = Vector3;
 
-__host__ __device__ inline Vector3 cross_product(const Vector3& lhs,
+__device__ __host__ inline Vector3 cross_product(const Vector3& lhs,
                                                  const Vector3& rhs);
 
 } // namespace space

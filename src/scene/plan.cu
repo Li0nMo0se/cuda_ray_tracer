@@ -4,8 +4,9 @@ namespace scene
 {
 __device__ Plan::Plan(const space::Point3& origin,
                       const space::Vector3& normal,
-                      const color::TextureMaterial* const texture)
-    : Object(texture)
+                      const color::TextureMaterial* const texture,
+                      const space::Vector3& translation)
+    : Object(texture, translation)
     , origin_(origin)
     , normal_(normal.normalized())
     , opposite_normal_(-normal_)

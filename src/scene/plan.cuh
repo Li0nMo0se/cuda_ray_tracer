@@ -11,7 +11,8 @@ class Plan final : public Object
   public:
     __device__ Plan(const space::Point3& origin,
                     const space::Vector3& normal,
-                    const color::TextureMaterial* const texture);
+                    const color::TextureMaterial* const texture,
+                    const space::Vector3& translation);
 
     __device__ virtual cuda_tools::Optional<space::IntersectionInfo>
     intersect(const space::Ray& ray) const override;

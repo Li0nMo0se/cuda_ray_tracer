@@ -11,7 +11,8 @@ class Triangle final : public Object
     __device__ Triangle(const space::Point3& A,
                         const space::Point3& B,
                         const space::Point3& C,
-                        const color::TextureMaterial* const texture);
+                        const color::TextureMaterial* const texture,
+                        const space::Vector3& translation);
 
     __device__ virtual cuda_tools::Optional<space::IntersectionInfo>
     intersect(const space::Ray& ray) const override;

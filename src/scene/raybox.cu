@@ -5,8 +5,9 @@ namespace scene
 
 __device__ RayBox::RayBox(const space::Point3& lower_bound,
                           const space::Point3& higher_bound,
-                          const color::TextureMaterial* const texture)
-    : Object(texture)
+                          const color::TextureMaterial* const texture,
+                          const space::Vector3& translation)
+    : Object(texture, translation)
     , lower_bound_(lower_bound)
     , higher_bound_(higher_bound)
     , center_(compute_center())

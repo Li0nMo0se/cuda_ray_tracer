@@ -29,9 +29,8 @@ constexpr float epsilone = 1e-6;
 class Object : public Translatable
 {
   public:
-    __device__
-    Object(const color::TextureMaterial* const texture,
-           const space::Vector3& translation = space::Vector3(0.f, 0.f, 0.f))
+    __device__ Object(const color::TextureMaterial* const texture,
+                      const space::Vector3& translation)
         : Translatable(translation)
         , texture_(texture)
     {
