@@ -16,6 +16,10 @@
 #include <sstream>
 #include <unordered_map>
 
+#ifndef M_PI
+constexpr float M_PI = 3.141592653589793;
+#endif
+
 namespace parse
 {
 using map_texture_t =

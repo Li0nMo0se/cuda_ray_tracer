@@ -289,7 +289,7 @@ void Engine::render(const std::string& filename,
     //      (Calculate specular & diffuse contribution)
     constexpr int TILE_W = 32;
     constexpr int TILE_H = 2;
-    constexpr dim3 block(TILE_W, TILE_H);
+    const dim3 block(TILE_W, TILE_H);
     const dim3 grid(1 + (resolution_width - 1) / block.x,
                     1 + (resolution_height - 1) / block.y);
 

@@ -2,7 +2,7 @@
 
 namespace cuda_tools
 {
-extern struct _nullopt
+struct _nullopt
 {
     explicit constexpr _nullopt() {}
 } const nullopt;
