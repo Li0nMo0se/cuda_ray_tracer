@@ -1,0 +1,42 @@
+Camera (0,2,-1) (0,1,0) (0,0,1) 1 45 45
+
+PointLight (0,4,0) 0.7
+
+UniformTexture red (255,0,0) 2 0 1
+UniformTexture red_reflected (255,0,0) 2 0.5 1
+UniformTexture white_reflected (255,255,255) 1 0.5 1
+UniformTexture blue_reflected (0,0,255) 2 0.5 1
+UniformTexture yellow (255,255,0) 2 0 1
+UniformTexture green_reflected (0,255,0) 2 0.5 1
+UniformTexture green (0,255,0) 2 0 1
+UniformTexture cyan (0,255,255) 2 0 1
+UniformTexture orange_reflected (255,55,3) 2 0.5 1
+UniformTexture pink_reflected (255,153,166) 2 0.5 1
+UniformTexture brown_reflected (102,51,0) 2 0.5 1
+
+
+Sphere (-3,1,7) 1 red
+Sphere (0,1,9) 1 white_reflected
+Sphere (2,0.5,3) 0.5 blue_reflected
+Sphere (-1,2,14) 2 yellow
+Sphere (3,0.5,2) 0.5 green_reflected
+Sphere (-6,0.5,7) 0.5 cyan
+Sphere (0,0.5,2) 0.5 cyan
+Sphere (8,0.5,7) 0.5 yellow
+Sphere (3,1,5) 1 red_reflected
+Sphere (-3,0.5,3) 0.5 green
+Sphere (-1,0.5,5) 0.5 orange_reflected
+Sphere (-7,0.5,11) 0.5 orange_reflected
+Sphere (8,1,11) 1 pink_reflected
+Sphere (2,1,7) 1 pink_reflected
+Sphere (-2,0.5,4) 0.5 brown_reflected
+Sphere (1,0.5,4.5) 0.5 brown_reflected
+
+UniformTexture floor_texture (100,100,100) 1 0 0
+Plan (0,0,0) (0,1,0) floor_texture
+
+UniformTexture wall_texture (0,0,0) 1 0.2 0
+UniformTexture sky (135,206,235) 1 0 0
+Plan (0,0,20) (0,0,-1) sky
+Plan (10,0,0) (-1,0,0) wall_texture
+Plan (-10,0,0) (1,0,0) wall_texture
