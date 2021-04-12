@@ -38,7 +38,8 @@ void VideoEngine::render(const std::string& input_path,
     // Get input files
     std::vector<std::string> filename_scenes;
     for (const auto& entry : std::filesystem::directory_iterator(input_path))
-        filename_scenes.push_back(entry.path());
+        filename_scenes.push_back(
+            reinterpret_cast<const char*>(entry.path().c_str()));
     std::sort(filename_scenes.begin(), filename_scenes.end());
 
     std::vector<Worker> workers;
