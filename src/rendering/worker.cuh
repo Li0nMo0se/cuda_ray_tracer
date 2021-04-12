@@ -1,6 +1,5 @@
 #pragma once
 
-#include "cuda_tools/cuda_error.cuh"
 #include <string>
 #include <thread>
 
@@ -15,17 +14,15 @@ class Worker
            const uint32_t height,
            const uint32_t aliasing_level,
            const uint32_t reflection_max_depth)
-    {
-        cuda_safe_call(
-            cudaStreamCreateWithFlags(&stream_, cudaStreamNonBlocking));
-        thread_ = std::thread(&VideoEngine::render_frame,
+        : thread_(std::thread(&VideoEngine::render_frame,
                               input_filename,
                               output_filename,
                               width,
                               height,
                               aliasing_level,
-                              reflection_max_depth,
-                              stream_);
+                              reflection_max_depth))
+        , stream_(0)
+    {
     }
 
     void stop()

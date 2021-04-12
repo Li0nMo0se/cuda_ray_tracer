@@ -5,9 +5,14 @@
 #include <string>
 namespace rendering
 {
+class ISavable
+{
+  public:
+    __host__ virtual void save(const std::string& filename) const = 0;
+};
 
 template <typename T>
-class Image
+class Image : public ISavable
 {
   public:
     __host__ __device__ Image(const int32_t width, const int32_t height);
@@ -22,9 +27,7 @@ class Image
     __host__ virtual void free() = 0;
 
   protected:
-    __host__ void _copy(Image<T>& dst,
-                        cudaMemcpyKind memcpy_kind,
-                        const cudaStream_t stream) const;
+    __host__ void _copy(Image<T>& dst, cudaMemcpyKind memcpy_kind) const;
 
   protected:
     int32_t width_;
@@ -48,13 +51,11 @@ class DeviceImage final : public Image<T>
     __host__ __device__ DeviceImage(const int32_t width, const int32_t height);
 
     /* Deep Copy */
-    __host__ void copy(HostImage<T>& copy_host,
-                       const cudaStream_t stream) const;
+    __host__ void copy(HostImage<T>& copy_host) const;
 
     __host__ void free() override;
 
-    __host__ void save(const std::string& filename,
-                       const cudaStream_t stream) const;
+    __host__ void save(const std::string& filename) const override;
 };
 
 /* A host Image can be instatiated by the host (The memory will be in
@@ -68,24 +69,21 @@ class HostImage final : public Image<T>
     __host__ HostImage(const int32_t width, const int32_t height);
 
     /* Deep Copy */
-    __host__ void copy(DeviceImage<T>& copy_device,
-                       const cudaStream_t stream) const;
+    __host__ void copy(DeviceImage<T>& copy_device) const;
 
     __host__ void free() override;
 
-    __host__ inline void save(const std::string& filename) const;
+    __host__ inline void save(const std::string& filename) const override;
 };
 
 template <typename T>
-struct ImageHandler final
+struct ImageHandler final : public ISavable
 {
   public:
-    ImageHandler(const int32_t width,
-                 const int32_t height,
-                 const cudaStream_t stream);
+    ImageHandler(const int32_t width, const int32_t height);
     ~ImageHandler();
 
-    __host__ void save(const std::string& filename) const;
+    __host__ void save(const std::string& filename) const override;
 
     // Copy from host to device
     __host__ void copy_host_to_device();
@@ -94,9 +92,6 @@ struct ImageHandler final
 
     HostImage<T> host;
     DeviceImage<T> device;
-
-  private:
-    cudaStream_t stream_;
 };
 } // namespace rendering
 

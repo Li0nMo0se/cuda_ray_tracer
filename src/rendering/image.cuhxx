@@ -42,16 +42,12 @@ inline int32_t Image<T>::height_get() const
 }
 
 template <typename T>
-void Image<T>::_copy(Image<T>& dst,
-                     cudaMemcpyKind memcpy_kind,
-                     const cudaStream_t stream) const
+void Image<T>::_copy(Image<T>& dst, cudaMemcpyKind memcpy_kind) const
 {
-    cuda_safe_call(cudaMemcpyAsync(dst.data_,
-                                   this->data_,
-                                   sizeof(T) * this->width_ * this->height_,
-                                   memcpy_kind,
-                                   stream));
-    cuda_safe_call(cudaStreamSynchronize(stream));
+    cuda_safe_call(cudaMemcpy(dst.data_,
+                              this->data_,
+                              sizeof(T) * this->width_ * this->height_,
+                              memcpy_kind));
 }
 
 /** DeviceImage **/
@@ -64,10 +60,9 @@ DeviceImage<T>::DeviceImage(const int32_t width, const int32_t height)
 }
 
 template <typename T>
-void DeviceImage<T>::copy(HostImage<T>& copy_host,
-                          const cudaStream_t stream) const
+void DeviceImage<T>::copy(HostImage<T>& copy_host) const
 {
-    this->_copy(copy_host, cudaMemcpyDeviceToHost, stream);
+    this->_copy(copy_host, cudaMemcpyDeviceToHost);
 }
 
 template <typename T>
@@ -77,12 +72,11 @@ void DeviceImage<T>::free()
 }
 
 template <typename T>
-void DeviceImage<T>::save(const std::string& filename,
-                          const cudaStream_t stream) const
+void DeviceImage<T>::save(const std::string& filename) const
 {
     // Create HostImage from DeviceImage
     HostImage<T> copy_host(this->width_, this->height_);
-    this->copy(copy_host, stream);
+    this->copy(copy_host);
     // Save it
     copy_host.save(filename);
     // Release memory
@@ -154,20 +148,16 @@ void inline HostImage<T>::save(const std::string& filename) const
 }
 
 template <typename T>
-void HostImage<T>::copy(DeviceImage<T>& copy_device,
-                        const cudaStream_t stream) const
+void HostImage<T>::copy(DeviceImage<T>& copy_device) const
 {
-    this->_copy(copy_device, cudaMemcpyHostToDevice, stream);
+    this->_copy(copy_device, cudaMemcpyHostToDevice);
 }
 
 /** ImageHandler **/
 template <typename T>
-ImageHandler<T>::ImageHandler(const int32_t width,
-                              const int32_t height,
-                              const cudaStream_t stream)
+ImageHandler<T>::ImageHandler(const int32_t width, const int32_t height)
     : host(width, height)
     , device(width, height)
-    , stream_(stream)
 {
 }
 
@@ -181,19 +171,19 @@ ImageHandler<T>::~ImageHandler()
 template <typename T>
 void ImageHandler<T>::save(const std::string& filename) const
 {
-    device.save(filename, stream_);
+    device.save(filename);
 }
 
 template <typename T>
 void ImageHandler<T>::copy_host_to_device()
 {
-    host.copy(device, stream_);
+    host.copy(device);
 }
 
 template <typename T>
 void ImageHandler<T>::copy_device_to_host()
 {
-    device.copy(host, stream_);
+    device.copy(host);
 }
 
 } // namespace rendering

@@ -11,10 +11,10 @@ class Vector
 {
   public:
     // Default with constructor with a minimum capacity
-    Vector(const cudaStream_t stream);
+    Vector();
 
     // Constructor with a specified capacity
-    Vector(int32_t capacity, const cudaStream_t stream);
+    Vector(int32_t capacity);
 
     // Deep destructor
     ~Vector();
@@ -60,8 +60,6 @@ class Vector
 
     // The default capacity of the vector
     static constexpr int32_t begin_capacity = 16;
-
-    cudaStream_t stream_;
 };
 
 } // namespace cuda_tools

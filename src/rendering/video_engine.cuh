@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+
 namespace rendering
 {
 
@@ -24,8 +25,7 @@ class VideoEngine final
                              const uint32_t width,
                              const uint32_t height,
                              const uint32_t aliasing_level,
-                             const uint32_t reflection_max_depth,
-                             const cudaStream_t stream);
+                             const uint32_t reflection_max_depth);
 
   private:
     static std::string get_output_filename(const std::string& output_path,

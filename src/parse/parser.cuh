@@ -21,6 +21,5 @@ class ParseError : public std::exception
 };
 
 /* Read a file and return the scene according to the description in the file */
-scene::Scene parse_scene(const std::string& filename,
-                         const cudaStream_t stream);
+scene::Scene parse_scene(const std::string& filename);
 } // namespace parse
