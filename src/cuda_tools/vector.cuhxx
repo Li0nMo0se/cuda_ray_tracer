@@ -35,7 +35,7 @@ Vector<T>::Vector(int32_t capacity)
 }
 
 template <typename T>
-Vector<T>::~Vector()
+void Vector<T>::free()
 {
     if (data_)
     {
@@ -43,28 +43,6 @@ Vector<T>::~Vector()
         _kernel_dealloc<<<1, 1>>>(data_, size_);
         cuda_safe_call(cudaFree(data_));
     }
-}
-
-template <typename T>
-Vector<T>::Vector(Vector& other)
-    : Vector(std::move(other))
-{
-}
-
-template <typename T>
-Vector<T>::Vector(Vector&& other)
-{
-    cuda_safe_call(cudaDeviceSynchronize());
-
-    // Copy fields
-    size_ = other.size_;
-    capacity_ = other.capacity_;
-    data_ = other.data_;
-
-    // Empty other
-    other.size_ = 0;
-    other.capacity_ = 0;
-    other.data_ = nullptr;
 }
 
 template <typename T>
@@ -107,6 +85,13 @@ __device__ inline int32_t Vector<T>::size_get() const
 
 template <typename T>
 __device__ inline const T& Vector<T>::operator[](const int32_t pos) const
+{
+    assert(pos < size_);
+    return *(data_[pos]);
+}
+
+template <typename T>
+__device__ inline T& Vector<T>::operator[](const int32_t pos)
 {
     assert(pos < size_);
     return *(data_[pos]);

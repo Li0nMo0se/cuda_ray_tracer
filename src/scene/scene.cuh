@@ -9,7 +9,8 @@
 namespace rendering
 {
 class Engine;
-}
+class VideoEngine;
+} // namespace rendering
 
 namespace scene
 {
@@ -36,7 +37,17 @@ class Scene final
         return camera_;
     }
 
-    friend rendering::Engine; // The engine owns the scene
+    inline void free()
+    {
+        objects_.free();
+        lights_.free();
+        textures_.free();
+    }
+
+    // The VideoEngine owns the scene
+    friend rendering::VideoEngine;
+    // The engine handle the scene but do not modify it
+    friend rendering::Engine;
 
   private:
     // The unique camera of the scene

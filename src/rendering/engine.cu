@@ -253,7 +253,7 @@ __global__ void kernel_render(DeviceImage<color::Color3> d_img,
 void Engine::render(const std::string& filename,
                     const int32_t resolution_width,
                     const int32_t resolution_height,
-                    scene::Scene& scene,
+                    const scene::Scene& scene,
                     const int32_t aliasing_level,
                     const int32_t reflection_max_depth)
 {

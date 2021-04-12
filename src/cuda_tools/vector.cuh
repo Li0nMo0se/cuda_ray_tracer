@@ -17,13 +17,7 @@ class Vector
     Vector(int32_t capacity);
 
     // Deep destructor
-    ~Vector();
-
-    // Define copy as move constructor to avoid loose of ownership and multiple
-    // delete (Can't duplicate vector)
-    Vector(Vector& other);
-    // Move copy constructor. Move the ownership.
-    Vector(Vector&& other);
+    void free();
 
     Vector& operator=(const Vector&) = delete;
 
@@ -42,6 +36,7 @@ class Vector
 
     // Get the nth-element
     __device__ inline const T& operator[](const int32_t pos) const;
+    __device__ inline T& operator[](const int32_t pos);
 
     // Get back of the vector
     const T** back_get() const;
