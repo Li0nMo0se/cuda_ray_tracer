@@ -1,16 +1,15 @@
-#include "parse/parser.cuh"
-#include "rendering/engine.cuh"
-#include "scene/scene.cuh"
+#include "rendering/video_engine.cuh"
 #include <iostream>
 #include <sstream>
 #include <string>
 
 int main(int argc, char* argv[])
 {
-    if (argc != 7)
+    if (argc != 8)
     {
         std::cerr << "Usage: " << argv[0]
-                  << " file.scene outputfile.ppm width height aliasing_level "
+                  << " input_directory output_directory width height nb_frames "
+                     "aliasing_level "
                   << "reflection_max_depth\n";
         return EXIT_FAILURE;
     }
@@ -22,20 +21,25 @@ int main(int argc, char* argv[])
     std::stringstream ss_height(argv[4]);
     ss_height >> height;
 
+    uint32_t nb_frames;
+    std::stringstream ss_nb_frames(argv[5]);
+    ss_nb_frames >> nb_frames;
+
     uint32_t aliasing_level;
-    std::stringstream ss_aliasing(argv[5]);
+    std::stringstream ss_aliasing(argv[6]);
     ss_aliasing >> aliasing_level;
 
     uint32_t reflection_max_depth;
-    std::stringstream ss_reflection(argv[6]);
+    std::stringstream ss_reflection(argv[7]);
     ss_reflection >> reflection_max_depth;
 
-    scene::Scene scene = parse::parse_scene(argv[1]);
-    rendering::Engine::render(argv[2],
-                              width,
-                              height,
-                              scene,
-                              aliasing_level,
-                              reflection_max_depth);
+    rendering::VideoEngine::render(argv[1],
+                                   argv[2],
+                                   width,
+                                   height,
+                                   nb_frames,
+                                   aliasing_level,
+                                   reflection_max_depth);
+
     return EXIT_SUCCESS;
 }

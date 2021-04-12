@@ -15,6 +15,7 @@ set(SRC
     src/main.cu
     src/parse/parser.cu
     src/rendering/engine.cu
+    src/rendering/video_engine.cu
     src/scene/camera.cu
     src/scene/plan.cu
     src/scene/raybox.cu
