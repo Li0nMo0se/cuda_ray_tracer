@@ -24,7 +24,8 @@ class VideoEngine final
     static void save(const color::Color3* const d_frame,
                      const int32_t width,
                      const int32_t height,
-                     const std::string& filename);
+                     const std::string& filename,
+                     const cudaStream_t stream);
 
   private:
     static std::string get_output_filename(const std::string& output_path,

@@ -256,7 +256,8 @@ void Engine::render(color::Color3* const frame,
                     const int32_t resolution_height,
                     const scene::Scene& scene,
                     const int32_t aliasing_level,
-                    const int32_t reflection_max_depth)
+                    const int32_t reflection_max_depth,
+                    const cudaStream_t stream)
 {
     // Find width & height of a pixel
     const scene::Camera& camera = scene.camera_get();
@@ -296,13 +297,13 @@ void Engine::render(color::Color3* const frame,
                                top_left,
                                unit_x,
                                unit_y};
-    kernel_render<<<grid, block>>>(frame,
-                                   scene,
-                                   frame_info,
-                                   aliasing_level,
-                                   reflection_max_depth);
+    kernel_render<<<grid, block, 0, stream>>>(frame,
+                                              scene,
+                                              frame_info,
+                                              aliasing_level,
+                                              reflection_max_depth);
 
-    cuda_safe_call(cudaDeviceSynchronize());
+    cuda_safe_call(cudaStreamSynchronize(stream));
     check_error();
 }
 } // namespace rendering

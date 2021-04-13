@@ -32,14 +32,19 @@ static uint8_t get_color_with_boundary(const T val)
 void VideoEngine::save(const color::Color3* const d_frame,
                        const int32_t width,
                        const int32_t height,
-                       const std::string& filename)
+                       const std::string& filename,
+                       const cudaStream_t stream)
 {
     // Copy frame
     const int32_t total_size = sizeof(color::Color3) * width * height;
     color::Color3* const h_frame =
         static_cast<color::Color3*>(std::malloc(total_size));
-    cuda_safe_call(
-        cudaMemcpy(h_frame, d_frame, total_size, cudaMemcpyDeviceToHost));
+    cuda_safe_call(cudaMemcpyAsync(h_frame,
+                                   d_frame,
+                                   total_size,
+                                   cudaMemcpyDeviceToHost,
+                                   stream));
+    cuda_safe_call(cudaStreamSynchronize(stream));
 
     // Write file
     std::ofstream of(filename, std::ios_base::out | std::ios_base::binary);
@@ -93,6 +98,11 @@ void VideoEngine::render(const std::string& input_path,
         cudaMalloc((void**)&frames,
                    sizeof(color::Color3) * total_resolution * nb_frames));
 
+    cudaStream_t stream_compute;
+    cudaStream_t stream_save;
+    cuda_safe_call(cudaStreamCreate(&stream_compute));
+    cuda_safe_call(cudaStreamCreate(&stream_save));
+
     std::vector<SaveWorker> workers;
     for (int32_t index_frame = 0; index_frame < nb_frames; index_frame++)
     {
@@ -104,20 +114,23 @@ void VideoEngine::render(const std::string& input_path,
                        resolution_height,
                        scene,
                        aliasing_level,
-                       reflection_max_depth);
+                       reflection_max_depth,
+                       stream_compute);
 
         workers.emplace_back(
             curr_frame,
             resolution_width,
             resolution_height,
-            get_output_filename(output_path, index_frame, max_digits));
+            get_output_filename(output_path, index_frame, max_digits),
+            stream_save);
 
         // FIXME: Correct?
         constexpr int32_t TILE_W = 64;
         const dim3 block(TILE_W);
         const dim3 grid(1 + (nb_objects - 1) / block.x);
 
-        update_scene<<<grid, block>>>(scene.objects_, nb_objects);
+        update_scene<<<grid, block, 0, stream_compute>>>(scene.objects_,
+                                                         nb_objects);
     }
 
     for (SaveWorker& worker : workers)

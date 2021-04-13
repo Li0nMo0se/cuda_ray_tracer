@@ -12,9 +12,14 @@ class SaveWorker
     SaveWorker(const color::Color3* const frame,
                const int32_t width,
                const int32_t height,
-               const std::string& output_filename)
-        : thread_(std::thread(
-              &VideoEngine::save, frame, width, height, output_filename))
+               const std::string& output_filename,
+               const cudaStream_t stream)
+        : thread_(std::thread(&VideoEngine::save,
+                              frame,
+                              width,
+                              height,
+                              output_filename,
+                              stream))
     {
     }
 
