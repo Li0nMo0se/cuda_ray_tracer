@@ -24,7 +24,6 @@ set(SRC
 )
 
 set(SRC_TESTS
-    tests/test_image.cu
 )
 
 # ---
