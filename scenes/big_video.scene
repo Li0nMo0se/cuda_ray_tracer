@@ -2,13 +2,20 @@ Camera (0,4,-2) (0,1,0) (0,0,1) 1 45 45
 PointLight (-1,4,0) 1
 
 UniformTexture red (255,0,0) 1 0 1
-Sphere (0,1,0.5) 1 red (0,0,0.5)
+Sphere (0,1,1) 1 red (0,0,0.5)
 
 UniformTexture green (0,255,0) 1 0 1
 Sphere (-6,1,1) 1 green (0,0,1)
 
 UniformTexture blue (0,0,255) 1 0 1
-Sphere (6,1,2) 1 blue (0,0,2)
+Sphere (6,1,1) 1 blue (0,0,2.4)
+
+Sphere (-10,1,1) 1 blue (0,0,1.2)
+Sphere (10,1,1) 1 green (0,0,1.5)
+
+Sphere (-16,1,4) 1 red (1,0,0)
+
+Sphere (-5,1,-2) 1 red (0.5,0,2)
 
 UniformTexture ground_texture (100,100,100) 1 0 0
 Plan (0,0,0) (0,1,0) ground_texture
