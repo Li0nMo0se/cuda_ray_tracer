@@ -1,7 +1,6 @@
 #pragma once
 
 #include "color/color.cuh"
-#include "rendering/image.cuh"
 #include "scene/scene.cuh"
 #include <string>
 
@@ -14,7 +13,7 @@ class Engine final
      * The engine do not modify the scene, but it is destroyed at the end of the
      * rendering
      */
-    static void render(const std::string& filename,
+    static void render(color::Color3* const frame,
                        const int32_t resolution_width,
                        const int32_t resolution_height,
                        const scene::Scene& scene,

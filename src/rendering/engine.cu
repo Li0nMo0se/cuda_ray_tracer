@@ -216,13 +216,15 @@ Engine::get_pixel_color(const space::Point3& curr_pixel,
 
 struct FrameInfo
 {
+    const int32_t width;
+    const int32_t height;
     const space::Point3 top_left;
     const float unit_x;
     const float unit_y;
 };
 
 // Copy arguments to have them in gpu registers, cache L1...
-__global__ void kernel_render(DeviceImage<color::Color3> d_img,
+__global__ void kernel_render(color::Color3* const frame,
                               const scene::Scene scene,
                               const FrameInfo frame_info,
                               const int32_t aliasing_level,
@@ -231,7 +233,7 @@ __global__ void kernel_render(DeviceImage<color::Color3> d_img,
     const int32_t x = blockDim.x * blockIdx.x + threadIdx.x;
     const int32_t y = blockDim.y * blockIdx.y + threadIdx.y;
 
-    if (x >= d_img.width_get() || y >= d_img.height_get())
+    if (x >= frame_info.width || y >= frame_info.height)
         return;
 
     const scene::Camera& camera = scene.camera_get();
@@ -239,9 +241,8 @@ __global__ void kernel_render(DeviceImage<color::Color3> d_img,
                                      x * (frame_info.unit_x * camera.x_axis_) -
                                      y * (frame_info.unit_y * camera.y_axis_);
 
-    color::Color3* const data = d_img.data_get();
     // Ray computation with aliasing
-    data[y * d_img.width_get() + x] =
+    frame[y * frame_info.width + x] =
         Engine::get_pixel_color(curr_pixel,
                                 scene,
                                 frame_info.unit_x,
@@ -250,16 +251,13 @@ __global__ void kernel_render(DeviceImage<color::Color3> d_img,
                                 reflection_max_depth);
 }
 
-void Engine::render(const std::string& filename,
+void Engine::render(color::Color3* const frame,
                     const int32_t resolution_width,
                     const int32_t resolution_height,
                     const scene::Scene& scene,
                     const int32_t aliasing_level,
                     const int32_t reflection_max_depth)
 {
-    // Create Image
-    ImageHandler<color::Color3> im(resolution_width, resolution_height);
-
     // Find width & height of a pixel
     const scene::Camera& camera = scene.camera_get();
 
@@ -293,8 +291,12 @@ void Engine::render(const std::string& filename,
     const dim3 grid(1 + (resolution_width - 1) / block.x,
                     1 + (resolution_height - 1) / block.y);
 
-    const FrameInfo frame_info{top_left, unit_x, unit_y};
-    kernel_render<<<grid, block>>>(im.device,
+    const FrameInfo frame_info{resolution_width,
+                               resolution_height,
+                               top_left,
+                               unit_x,
+                               unit_y};
+    kernel_render<<<grid, block>>>(frame,
                                    scene,
                                    frame_info,
                                    aliasing_level,
@@ -302,10 +304,5 @@ void Engine::render(const std::string& filename,
 
     cuda_safe_call(cudaDeviceSynchronize());
     check_error();
-
-    // scene not usable because it has been copied
-
-    // Retrive image
-    im.save(filename);
 }
 } // namespace rendering
