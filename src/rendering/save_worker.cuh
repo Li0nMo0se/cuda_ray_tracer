@@ -13,11 +13,8 @@ class SaveWorker
                const int32_t width,
                const int32_t height,
                const std::string& output_filename)
-        : thread_(std::thread(&VideoEngine::save,
-                              frame,
-                              width,
-                              height,
-                              std::ref(output_filename)))
+        : thread_(std::thread(
+              &VideoEngine::save, frame, width, height, output_filename))
     {
     }
 

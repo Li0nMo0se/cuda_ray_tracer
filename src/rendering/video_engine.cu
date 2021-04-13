@@ -70,7 +70,6 @@ void VideoEngine::save(const color::Color3* const d_frame,
     }
 
     of.close();
-
     std::free(h_frame);
 }
 
@@ -107,13 +106,11 @@ void VideoEngine::render(const std::string& input_path,
                        aliasing_level,
                        reflection_max_depth);
 
-        const std::string output_filename =
-            get_output_filename(output_path, index_frame, max_digits);
-
-        workers.emplace_back(curr_frame,
-                             resolution_width,
-                             resolution_height,
-                             output_filename);
+        workers.emplace_back(
+            curr_frame,
+            resolution_width,
+            resolution_height,
+            get_output_filename(output_path, index_frame, max_digits));
 
         // FIXME: Correct?
         constexpr int32_t TILE_W = 64;
