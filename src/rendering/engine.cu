@@ -115,7 +115,7 @@ Engine::cast_ray_color(const space::Ray& ray,
 
     // Primary color
     if (!opt_intersection.has_value())
-        return color::black();
+        return color::sky();
 
     space::IntersectionInfo& intersection_info = opt_intersection.value();
     const scene::Object& intersected_obj = intersection_info.obj_get();

@@ -9,5 +9,5 @@ using Color3 = space::Vector<3, float>;
 // FIXME: Make those variables accessible from the device
 __device__ constexpr Color3 black() { return Color3(0.f, 0.f, 0.f); }
 __device__ constexpr Color3 white() { return Color3(255.f, 255.f, 255.f); }
-__device__ constexpr Color3 background() { return black(); }
+__device__ constexpr Color3 sky() { return Color3(53.f, 81.f, 92.f); }
 } // namespace color
