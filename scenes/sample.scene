@@ -1,0 +1,37 @@
+# This is ignored
+# A vector or a point must be declared this way (x,y,z)
+# Such as Camera origin y_axis z_axis z_min alpha beta
+# alpha/beta in degrees
+Camera (0,0,0) (0,1,0) (0,0,1) 1 45 45
+
+# UniformTexture such as
+# UniformTexture texture_name color kd ks ns
+UniformTexture red (255,0,0) 2 15 1
+
+# PointLight such as
+# PointLight origin intensity
+PointLight (0,1,0) 1
+
+# Objects
+# For objects, a translation can be defined by appending a vector (direction
+# of the translation) at the object declaration
+
+
+# Sphere such as
+# Sphere origin radius texture_name
+Sphere (0,0,2) 1 red
+
+# Translation example
+# Sphere (0,0,2) 1 red (0,0,1)
+
+UniformTexture plan_texture (0,255,255) 1 1 1
+# Plan such as
+# Plan origin normal texture_name
+Plan (0,0,0) (0,1,0) plan_texture
+
+# Triangle such as Triange A B C texture
+Triangle (0,1,1) (0,0,1) (0,-1,1) red
+
+# Raybox such as
+# Raybox lower_bound higher_bound texture
+Raybox (-1,0,1) (1,1,2) red
