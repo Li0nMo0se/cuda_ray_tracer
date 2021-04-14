@@ -3,20 +3,20 @@ PointLight (0,4,0) 1
 
 # Sphere
 UniformTexture red (255,0,0) 1 0 1
-Sphere (0,1,1) 1 red (0,0,0.5)
+Sphere (0,1,1) 1 red (0,0,0.25)
 
 UniformTexture green (0,255,0) 1 0 1
-Sphere (-6,1,1) 1 green (0,0,1)
+Sphere (-6,1,1) 1 green (0,0,0.5)
 
 UniformTexture blue (0,0,255) 1 0 1
-Sphere (6,1,1) 1 blue (0,0,2.4)
+Sphere (6,1,1) 1 blue (0,0,1.7)
 
-Sphere (-10,1,1) 1 blue (0,0,1.2)
-Sphere (10,1,1) 1 green (0,0,1.5)
+Sphere (-10,1,1) 1 blue (0,0,0.6)
+Sphere (10,1,1) 1 green (0,0,0.75)
 
-Sphere (-16,1,4) 1 red (1,0,0)
+Sphere (-16,1,4) 1 red (0.25,0,0)
 
-Sphere (-5,1,-2) 1 red (0.5,0,2)
+Sphere (-5,1,-2) 1 red (0.25,0,1)
 
 # Raybox
 UniformTexture raybox_1 (204,153,0) 1 0.5 1
@@ -24,32 +24,32 @@ UniformTexture raybox_2 (0,153,0) 1 0.5 1
 UniformTexture raybox_3 (255,51,153) 1 0.5 1
 UniformTexture raybox_4 (51,225,255) 1 0.5 1
 # Right
-Raybox (13,0,21) (15,2,51) raybox_1 (0,0,-0.1)
-Raybox (13,2,21) (15,4,31) raybox_2 (0,0,-0.1)
-Raybox (13,2,31) (15,4,41) raybox_3 (0,0,-0.1)
-Raybox (13,2,37) (15,4,51) raybox_4 (0,0,-0.1)
-Raybox (13,4,21) (15,6,31) raybox_3 (0,0,-0.1)
-Raybox (13,4,27) (15,6,41) raybox_4 (0,0,-0.1)
-Raybox (13,4,41) (15,6,51) raybox_2 (0,0,-0.1)
-Raybox (13,6,21) (15,8,31) raybox_4 (0,0,-0.1)
-Raybox (13,6,31) (15,8,41) raybox_2 (0,0,-0.1)
-Raybox (13,6,41) (15,8,51) raybox_3 (0,0,-0.1)
-Raybox (13,8,21) (15,10,51) raybox_1 (0,0,-0.1)
+Raybox (13,0,21) (15,2,51) raybox_1 (0,0,-0.05)
+Raybox (13,2,21) (15,4,31) raybox_2 (0,0,-0.05)
+Raybox (13,2,31) (15,4,41) raybox_3 (0,0,-0.05)
+Raybox (13,2,37) (15,4,51) raybox_4 (0,0,-0.05)
+Raybox (13,4,21) (15,6,31) raybox_3 (0,0,-0.05)
+Raybox (13,4,27) (15,6,41) raybox_4 (0,0,-0.05)
+Raybox (13,4,41) (15,6,51) raybox_2 (0,0,-0.05)
+Raybox (13,6,21) (15,8,31) raybox_4 (0,0,-0.05)
+Raybox (13,6,31) (15,8,41) raybox_2 (0,0,-0.05)
+Raybox (13,6,41) (15,8,51) raybox_3 (0,0,-0.05)
+Raybox (13,8,21) (15,10,51) raybox_1 (0,0,-0.05)
 
 # Top
 UniformTexture raybox_top (102,102,51) 1 0 0
-Raybox (-20,8,21) (13,10,51) raybox_top (0,0,-0.1)
+Raybox (-20,8,21) (13,10,51) raybox_top (0,0,-0.05)
 
 # between Top and Top 2
 UniformTexture raybox_5  (215,189,226) 1 0.5 1
-Raybox (13,10,21) (15,20,51) raybox_5 (0,0,-0.1)
+Raybox (13,10,21) (15,20,51) raybox_5 (0,0,-0.05)
 
 # Top 2
-Raybox (-20,20,21) (13,22,51) raybox_top (0,0,-0.1)
-Raybox (13,20,21) (15,22,51) raybox_1 (0,0,-0.1)
+Raybox (-20,20,21) (13,22,51) raybox_top (0,0,-0.05)
+Raybox (13,20,21) (15,22,51) raybox_1 (0,0,-0.05)
 
 UniformTexture sphere_top (169,50,38) 1 0.2 1
-Sphere (-3.5,15,45) 5 sphere_top (0,0,-0.4)
+Sphere (-3.5,15,45) 5 sphere_top (0,0,-0.2)
 
 UniformTexture ground_texture (200,200,200) 1 0.2 0.5
 Plan (0,0,0) (0,1,0) ground_texture
