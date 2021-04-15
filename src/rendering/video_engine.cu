@@ -96,18 +96,18 @@ void VideoEngine::render(const std::string& input_path,
     color::Color3* frames;
     cuda_safe_call(
         cudaMalloc((void**)&frames,
-                   sizeof(color::Color3) * total_resolution * nb_frames));
+                   sizeof(color::Color3) * total_resolution * 1));
 
     cudaStream_t stream_compute;
     cudaStream_t stream_save;
     cuda_safe_call(cudaStreamCreate(&stream_compute));
     cuda_safe_call(cudaStreamCreate(&stream_save));
 
-    std::vector<SaveWorker> workers;
+    //std::vector<SaveWorker> workers;
     for (int32_t index_frame = 0; index_frame < nb_frames; index_frame++)
     {
         color::Color3* const curr_frame =
-            frames + (total_resolution * index_frame);
+            frames + (total_resolution * 0);
         // Synchronization is made after call of the kernel
         Engine::render(curr_frame,
                        resolution_width,
@@ -117,12 +117,13 @@ void VideoEngine::render(const std::string& input_path,
                        reflection_max_depth,
                        stream_compute);
 
-        workers.emplace_back(
+        SaveWorker s(
             curr_frame,
             resolution_width,
             resolution_height,
             get_output_filename(output_path, index_frame, max_digits),
             stream_save);
+        s.stop();
 
         // FIXME: Correct?
         constexpr int32_t TILE_W = 64;
@@ -133,8 +134,8 @@ void VideoEngine::render(const std::string& input_path,
                                                          nb_objects);
     }
 
-    for (SaveWorker& worker : workers)
-        worker.stop();
+    // for (SaveWorker& worker : workers)
+    //     worker.stop();
 
     scene.free();
     cuda_safe_call(cudaFree(frames));
