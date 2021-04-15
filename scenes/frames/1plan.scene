@@ -9,7 +9,7 @@ Camera (0,1,0) (0,1,0) (0,0,1) 1 45 45
 # PointLight origin intensity
 PointLight (0,1,0) 1
 
-UniformTexture plan_texture (0,255,255) 1 1 1
+UniformTexture plan_texture (0,255,100) 1 1 1
 # Plan such as
 # Plan origin normal texture_name
 Plan (0,0,0) (0,1,0) plan_texture
