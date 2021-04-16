@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
     if (argc != 8)
     {
         std::cerr << "Usage: " << argv[0]
-                  << " input_directory output_directory width height nb_frames "
+                  << " input.scene output_directory width height nb_frames "
                      "aliasing_level "
                   << "reflection_max_depth\n";
         return EXIT_FAILURE;
