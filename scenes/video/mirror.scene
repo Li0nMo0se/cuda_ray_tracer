@@ -1,0 +1,25 @@
+Camera (0,1,0) (0,1,0) (0,0,1) 1 45 45
+
+PointLight (0,4,0) 0.7
+
+# Main Sphere
+UniformTexture white (255,255,255) 1 0.5 1
+Sphere (0,1,10) 1 white (0,0,-0.05)
+
+# Wall
+UniformTexture plan_texture (255,255,255) 1 0.5 1
+Plan (0,0,0) (0,1,0) plan_texture
+Plan (-10,0,0) (1,0,0) plan_texture
+Plan (10,0,0) (1,0,0) plan_texture
+Plan (10,0,15) (0,0,1) plan_texture
+
+# Background Sphere
+UniformTexture red (255,0,0) 2 0 1
+Sphere (-3,1,-5) 1 red
+UniformTexture blue (0,0,255) 2 0 1
+Sphere (3,1,-5) 1 blue
+UniformTexture yellow (255,255,0) 2 0 1
+Sphere (-1,2,-9) 2 yellow
+UniformTexture green (0,255,0) 2 0.5 1
+Sphere (1,0.5,-3) 0.5 green
+
