@@ -44,10 +44,10 @@ Usage:
 
 * **input.scene**: the input file (must have the .scene format)
 * **output_directoy**: the output directory in which the frames are stored (ppm format)
-*  **width**: width of the resolution of the output frame
-*  **height**: height of the resolution of the output frame
+* **width**: width of the resolution of the output frame
+* **height**: height of the resolution of the output frame
 * **nb_frames**: number of frames to record
-*  **aliasing level**: level of aliasing by side. (i.e if aliasing level equals to 2, compute the mean of 2x2=4 pixels)
+* **aliasing level**: level of aliasing by side. (i.e if aliasing level equals to 2, compute the mean of 2x2=4 pixels)
 * **reflection_max_depth**: the maximum depth for the reflection
 
 ## Features
