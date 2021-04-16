@@ -1,5 +1,7 @@
 
 # GPU Ray Tracer
+
+[Watch the video](https://youtu.be/-e_Pe3JDG8E)
 [![Watch the video](https://img.youtube.com/vi/-e_Pe3JDG8E/maxresdefault.jpg)](https://youtu.be/-e_Pe3JDG8E)
 
 ## Requirements
@@ -85,6 +87,7 @@ Several more samples can be found in ``scenes/*``:
 
 ### Video Rendering
 
+[Watch the video](https://youtu.be/-e_Pe3JDG8E)
 [![Watch the video](https://img.youtube.com/vi/-e_Pe3JDG8E/maxresdefault.jpg)](https://youtu.be/-e_Pe3JDG8E)
 
 ### Frame Rendering
