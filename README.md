@@ -1,4 +1,3 @@
-
 # GPU Ray Tracer
 
 [Watch the video](https://youtu.be/-e_Pe3JDG8E)
@@ -32,6 +31,26 @@ mkdir build_debug
 cd build_debug
 cmake ..
 make
+```
+
+### Windows
+
+Additional requirements:
+* [Python](https://www.python.org/downloads/)
+* [Ninja](https://github.com/ninja-build/ninja/releases)
+
+A wrapper for building the source code on Windows can be found in ``tools/build.py``. This python script will invoke Ninja to build fast with MSVC and NVCC.
+
+#### Release
+
+```shell
+python3 ./tools/build.py R
+```
+
+#### Debug
+
+```shell
+python3 ./tools/build.py D
 ```
 
 ## Run
@@ -82,6 +101,11 @@ Several more samples can be found in ``scenes/*``:
  * ``scenes/frames``: scenes are static (thus it is not needed to render more than one frame)
  * ``scenes/video``: scenes are static (thus it is not needed to render more than one frame)
 
+## Tools
+
+* ``tools/build.py``: wrapper to build on Windows. See usage above.
+* ``tools/ppm_to_png.sh``: convert a ppm to a png (with the least compression). Usage: ``tools/ppn_to_png.sh input.ppm output.png``
+* ``tools/ppm_to_video.sh``: convert a collection of ppm stored in a ``output`` folder. Usage: ``tools/ppm_to_video.sh output.mp4``
 
 ## Output
 
